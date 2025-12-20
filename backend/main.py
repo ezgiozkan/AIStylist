@@ -2,16 +2,15 @@ import os
 import io
 import json
 import uuid
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Query
 from pydantic import BaseModel
 from typing import List, Optional
 from PIL import Image
-from rembg import remove
+from rembg import remove, new_session
 from dotenv import load_dotenv
 
 import google.generativeai as genai
-from sentence_transformers import SentenceTransformer
-from pinecone import Pinecone
+from pinecone import Pinecone 
 from supabase import create_client, Client
 
 load_dotenv()
@@ -19,14 +18,23 @@ load_dotenv()
 app = FastAPI(title="AI Stylist Backend", description="RAG-based Fashion Recommendation API")
 
 # --- CONFIGURATION ---
+rembg_session = new_session("u2netp")
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 ai_model = genai.GenerativeModel('gemini-2.5-flash')
-embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 supabase: Client = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
 pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
 index = pc.Index("clothing-index")
 
 # --- DATA MODELS ---
+
+class ClothingItemDetail(BaseModel):
+    id: str
+    category: str
+    color: str
+    image_url: str
+    season: Optional[str] = None
+    formality: Optional[str] = None
+    description: Optional[str] = None
 
 class ClothingResponse(BaseModel):
     id: str
@@ -61,6 +69,14 @@ class TravelResponse(BaseModel):
     outfit_combinations: List[str]
     reasoning: str
 
+def get_embedding(text: str) -> List[float]:
+    result = genai.embed_content(
+        model="models/text-embedding-004",
+        content=text,
+        task_type="retrieval_document",
+    )
+    return result['embedding']
+
 # --- ENDPOINTS ---
 
 @app.post("/upload-clothing", response_model=ClothingResponse)
@@ -68,7 +84,8 @@ async def upload_clothing(file: UploadFile = File(...)):
     try:
         image_data = await file.read()
         input_image = Image.open(io.BytesIO(image_data))
-        output_image = remove(input_image)
+        input_image.thumbnail((800, 800))
+        output_image = remove(input_image, session=rembg_session)
         buffered = io.BytesIO()
         output_image.save(buffered, format="PNG")
         final_image_bytes = buffered.getvalue()
@@ -87,7 +104,7 @@ async def upload_clothing(file: UploadFile = File(...)):
         clothing_id = db_resp.data[0]['id']
         
         text_to_embed = f"{metadata['color']} {metadata['category']} {metadata['season']} {metadata['description']}"
-        vector = embedding_model.encode(text_to_embed).tolist()
+        vector = get_embedding(text_to_embed)
         metadata['image_url'] = final_image_url
         index.upsert(vectors=[{"id": clothing_id, "values": vector, "metadata": metadata}])
         
@@ -95,11 +112,25 @@ async def upload_clothing(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/wardrobe", response_model=List[ClothingItemDetail])
+async def get_wardrobe(category: Optional[str] = Query(None, description="Filter by category (e.g. 'Shoes')")):
+    try:
+        query = supabase.table("clothes").select("*").order("created_at", desc=True)
+        
+        if category:
+            query = query.ilike("category", f"%{category}%") 
+            
+        response = query.execute()
+        
+        return response.data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/recommend-outfit", response_model=RecommendationResponse)
 async def recommend_outfit(request: RecommendationRequest):
     try:
         search_query = f"{request.occasion} outfit for {request.weather} weather"
-        query_vector = embedding_model.encode(search_query).tolist()
+        query_vector = get_embedding(search_query)
         search_results = index.query(vector=query_vector, top_k=15, include_metadata=True)
         
         wardrobe_context = ""
@@ -143,7 +174,7 @@ async def recommend_travel_pack(request: TravelRequest):
     try:
         # 1. Broad Search for the Destination
         search_query = f"Clothes suitable for {request.destination} in {request.weather}"
-        query_vector = embedding_model.encode(search_query).tolist()
+        query_vector = get_embedding(search_query)
         
         # Retrieve top 30 items to ensure variety
         search_results = index.query(vector=query_vector, top_k=30, include_metadata=True)
