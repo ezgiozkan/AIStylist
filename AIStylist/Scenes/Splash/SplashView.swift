@@ -10,6 +10,8 @@ import SwiftUI
 struct SplashView: View {
     private var totalPages: Int { pages.count }
     @State private var currentPage = 0
+    @State private var isHomePresented = false
+    @AppStorage("didCompleteOnboarding") private var didCompleteOnboarding = false
 
     private struct OnboardingCopy {
         let title1: String
@@ -19,19 +21,19 @@ struct SplashView: View {
 
     private let pages: [OnboardingCopy] = [
         .init(
-            title1: "Get daily outfit",
-            title2: "suggestions",
-            subtitle: "Let our AI stylist curate the perfect look for you based on your wardrobe, weather, and mood."
+            title1: "We learn your style, body type",
+            title2: "and preferences",
+            subtitle: "Let our smart mascot analyze your fashion taste to recommend outfits that fit you perfectly."
         ),
         .init(
-            title1: "Upload photos of",
-            title2: "your entire wardrobe",
-            subtitle: "Snap or upload photos of your clothes to create your digital closet and get better outfit suggestions."
+            title1: "Get daily outfit suggestions",
+            title2: "powered by Al",
+            subtitle: "Your personal fashion assistant that learns your style and suggests perfect looks every morning."
         ),
         .init(
             title1: "Save looks and plan your",
             title2: "outfits by day",
-            subtitle: "Style AI helps you organize your wardrobe. Schedule your best looks ahead of time and never wonder what to wear."
+            subtitle: "Organize your wardrobe digitally and schedule your perfect look for every occasion ahead of time."
         ),
         .init(
             title1: "Your style journey",
@@ -54,7 +56,7 @@ struct SplashView: View {
 
             VStack {
                 VStack(spacing: 16) {
-                    
+
                     HStack(spacing: 8) {
                         Image(systemName: "sparkles")
                             .font(.system(size: 14, weight: .semibold))
@@ -134,7 +136,8 @@ struct SplashView: View {
                                 currentPage += 1
                             }
                         } else {
-                            // finish action
+                            didCompleteOnboarding = true
+                            isHomePresented = true
                         }
                     } label: {
                         HStack(spacing: 10) {
@@ -164,6 +167,9 @@ struct SplashView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .fullScreenCover(isPresented: $isHomePresented) {
+                HomeView()
+            }
         }
     }
 }

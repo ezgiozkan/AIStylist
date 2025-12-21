@@ -11,7 +11,7 @@ import SwiftUI
 struct AIStylistApp: App {
     var body: some Scene {
         WindowGroup {
-            SplashView()
+            RootView()
         }
     }
 }
