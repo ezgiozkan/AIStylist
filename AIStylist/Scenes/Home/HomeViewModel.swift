@@ -37,7 +37,6 @@ final class HomeViewModel: ObservableObject {
 
             let temp = Int(dto.currentWeather.temperature.rounded())
             let condition = WeatherCode.description(for: dto.currentWeather.weathercode)
-            let wind = Int(dto.currentWeather.windspeed.rounded())
 
             weatherText = "Today · \(temp)°C · \(condition) · Light wind"
         } catch {

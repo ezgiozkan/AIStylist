@@ -19,12 +19,25 @@ struct RootView: View {
             TravelView().tag(AppTab.travel)
             ProfileView().tag(AppTab.profile)
         }
-        .toolbar(.hidden, for: .tabBar)
+        .modifier(HideSystemTabBarCompat())
         .safeAreaInset(edge: .bottom) {
             TabBarView()
         }
         .sheet(isPresented: $showCreate) {
             CreateOutfitView()
+        }
+    }
+}
+
+private struct HideSystemTabBarCompat: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, *) {
+            content
+                .toolbar(.hidden, for: .tabBar)
+        } else {
+            content
+                .onAppear { UITabBar.appearance().isHidden = true }
+                .onDisappear { UITabBar.appearance().isHidden = false }
         }
     }
 }

@@ -1,5 +1,5 @@
 //
-//  Endpoint.swift
+//  HTTPClient.swift
 //  AIStylist
 //
 //  Created by Ezgi Özkan on 21.12.2025.

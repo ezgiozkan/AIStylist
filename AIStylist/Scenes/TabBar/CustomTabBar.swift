@@ -31,31 +31,67 @@ struct TabBarView: View {
     }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
+        Group {
+            if #available(iOS 18.0, *) {
+                TabView(selection: $selectedTab) {
+                    Tab("Home", systemImage: "house", value: .home) {
+                        HomeView()
+                    }
 
-            Tab("Home", systemImage: "house", value: .home) {
-                HomeView()
-            }
+                    Tab("Wardrobe", systemImage: "sparkles", value: .wardrobe) {
+                        WardrobeView()
+                    }
 
-            Tab("Wardrobe", systemImage: "sparkles", value: .wardrobe) {
-                WardrobeView()
-            }
+                    Tab("Create", systemImage: "wand.and.stars", value: .create) {
+                        CreateOutfitView()
+                    }
 
-            Tab("Create", systemImage: "plus", value: .create) {
-                CreateOutfitView()
-            }
+                    Tab("Travel", systemImage: "airplane", value: .travel) {
+                        TravelView()
+                    }
 
-            Tab("Travel", systemImage: "airplane", value: .travel) {
-                TravelView()
-            }
+                    Tab("Profile", systemImage: "person", value: .profile) {
+                        ProfileView()
+                    }
+                }
+            } else {
+                TabView(selection: $selectedTab) {
+                    HomeView()
+                        .tabItem { Label("Home", systemImage: "house") }
+                        .tag(AppTab.home)
 
-            Tab("Profile", systemImage: "person", value: .profile) {
-                ProfileView()
+                    WardrobeView()
+                        .tabItem { Label("Wardrobe", systemImage: "sparkles") }
+                        .tag(AppTab.wardrobe)
+
+                    CreateOutfitView()
+                        .tabItem { Label("Create", systemImage: "wand.and.stars") }
+                        .tag(AppTab.create)
+
+                    TravelView()
+                        .tabItem { Label("Travel", systemImage: "airplane") }
+                        .tag(AppTab.travel)
+
+                    ProfileView()
+                        .tabItem { Label("Profile", systemImage: "person") }
+                        .tag(AppTab.profile)
+                }
             }
         }
         .tabViewStyle(.automatic)
         .tint(.buttonPrimary)
-        .toolbarBackground(.visible, for: .tabBar)
-        .toolbarBackground(Color(.systemBackground), for: .tabBar)
+        .modifier(TabBarToolbarBackgroundCompat())
+    }
+}
+
+private struct TabBarToolbarBackgroundCompat: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 16.0, *) {
+            content
+                .toolbarBackground(.visible, for: .tabBar)
+                .toolbarBackground(Color(.systemBackground), for: .tabBar)
+        } else {
+            content
+        }
     }
 }

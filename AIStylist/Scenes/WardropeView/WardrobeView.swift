@@ -8,8 +8,66 @@
 import SwiftUI
 
 struct WardrobeView: View {
+    @State private var selectedCategory: WardrobeCategory = .all
+    @State private var items: [WardrobeItem] = WardrobeItem.demo
+
+    private var filteredItems: [WardrobeItem] {
+        guard selectedCategory != .all else { return items }
+        return items.filter { $0.category == selectedCategory }
+    }
+
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 16) {
+                header
+
+                WardrobeCategoryTabs(
+                    selected: $selectedCategory,
+                    categories: WardrobeCategory.allCases
+                )
+
+                if filteredItems.isEmpty {
+                    EmptyStateView(
+                        title: "No items yet",
+                        subtitle: "Add your first clothing item to start building your wardrobe."
+                    )
+                    .padding(.top, 12)
+                } else {
+                    LazyVGrid(
+                        columns: WardrobeLayout.columns,
+                        alignment: .center,
+                        spacing: WardrobeLayout.gridSpacing
+                    ) {
+                        ForEach(filteredItems) { item in
+                            WardrobeItemCard(
+                                item: item,
+                                onToggleFavorite: { toggleFavorite(for: item.id) }
+                            )
+                        }
+                    }
+                    .padding(.top, 4)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 28)
+        }
+        .background(Color(.systemGroupedBackground))
+    }
+
+    private var header: some View {
+        HStack(alignment: .center) {
+            Text("My Wardrobe")
+                .font(.system(size: 32, weight: .bold))
+                .foregroundStyle(.primary)
+
+            Spacer(minLength: 0)
+        }
+    }
+
+    private func toggleFavorite(for id: UUID) {
+        guard let index = items.firstIndex(where: { $0.id == id }) else { return }
+        items[index].isFavorite.toggle()
     }
 }
 

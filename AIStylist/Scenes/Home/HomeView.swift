@@ -43,6 +43,12 @@ struct HomeView: View {
                 }
                 .frame(height: 220)
 
+                StyleTipCard(
+                    title: "Style Tip of the Day",
+                    tip: "Monochrome outfits elongate your silhouette. Try matching your shoes to your pants today."
+                )
+                .padding(.horizontal, 16)
+
                 Spacer(minLength: 0)
             }
             .padding(.top, 24)
