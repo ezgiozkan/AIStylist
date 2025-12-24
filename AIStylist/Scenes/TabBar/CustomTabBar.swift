@@ -42,7 +42,7 @@ struct TabBarView: View {
                         WardrobeView()
                     }
 
-                    Tab("Create", systemImage: "wand.and.stars", value: .create) {
+                    Tab("", systemImage: "wand.and.stars", value: .create) {
                         CreateOutfitView()
                     }
 
@@ -65,7 +65,7 @@ struct TabBarView: View {
                         .tag(AppTab.wardrobe)
 
                     CreateOutfitView()
-                        .tabItem { Label("Create", systemImage: "wand.and.stars") }
+                        .tabItem { Label("", systemImage: "wand.and.stars") }
                         .tag(AppTab.create)
 
                     TravelView()

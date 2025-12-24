@@ -7,63 +7,135 @@
 
 import SwiftUI
 
-struct OutfitSuggestionCardView: View {
-    let style: Style
-    let background: Color
-    let subtitle: String
+enum OutfitCardType {
+    case casual
+    case work
 
-    enum Style {
-        case casual
-        case work
-
-        var title: String {
-            switch self {
-            case .casual: return "CASUAL"
-            case .work: return "WORK"
-            }
-        }
-
-        var accent: Color {
-            switch self {
-            case .casual: return HomeViewConstants.casualTagText
-            case .work: return HomeViewConstants.workTagText
-            }
+    var tagTitle: String {
+        switch self {
+        case .casual: return "CASUAL"
+        case .work: return "WORK"
         }
     }
 
+    var imageName: String {
+        switch self {
+        case .casual: return "icon_casual"
+        case .work: return "icon_work"
+        }
+    }
+
+    var title: String {
+        return "Daily Outfit Pick"
+    }
+
+    var tempDescription: String {
+        switch self {
+        case .casual:
+            return "Effortless pieces chosen for comfort and everyday style."
+        case .work:
+            return "Clean, polished essentials curated for a confident workday."
+        }
+    }
+}
+
+struct OutfitSuggestionCardView: View {
+    let type: OutfitCardType
+
     var body: some View {
-        RoundedRectangle(cornerRadius: 22, style: .continuous)
-            .fill(background)
-            .overlay(
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        Text(style.title)
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundStyle(style.accent)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(Color.white.opacity(0.7))
-                            )
+        VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .top) {
+                Image(type.imageName)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 330)
+                    .frame(maxWidth: .infinity)
+                    .clipped()
+                    .clipShape(RoundedCorner(radius: 28, corners: [.topLeft, .topRight]))
 
-                        Spacer()
+                HStack {
+                    Text(type.tagTitle)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Color.black)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 8)
+                        .background(
+                            Capsule()
+                                .fill(Color.white.opacity(0.92))
+                                .shadow(color: Color.black.opacity(0.10), radius: 10, x: 0, y: 6)
+                        )
 
+                    Spacer()
+
+                    Button(action: {}) {
                         Image(systemName: "hanger")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundStyle(style.accent.opacity(0.6))
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundStyle(type == .work ? Color.blue : Color.purple)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                Circle()
+                                    .fill(Color.white)
+                                    .overlay(Circle().stroke(Color.purple.opacity(0.18), lineWidth: 1))
+                                    .shadow(color: Color.black.opacity(0.08), radius: 10, x: 0, y: 6)
+                            )
                     }
-
-                    Text(subtitle)
-                        .font(.system(size: 16, weight: .regular))
-                        .foregroundStyle(Color.black.opacity(0.55))
-                        .multilineTextAlignment(.leading)
-                        .lineSpacing(4)
+                    .buttonStyle(.plain)
                 }
-                .padding(18),
-                alignment: .topLeading
-            )
-            .frame(width: 300, height: 200)
-            .shadow(color: Color.black.opacity(0.06), radius: 14, x: 0, y: 10)
+                .padding(12)
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                Text(type.title)
+                    .font(.system(size: 17, weight: .bold))
+                    .foregroundStyle(Color.textPrimary)
+
+                Text(type.tempDescription)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundStyle(Color.cardCasualBackground)
+                    .lineSpacing(4)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(14)
+            .padding(.bottom, 6)
+        }
+        .background(Color.white)
+        .frame(width: 330)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .shadow(color: Color.black.opacity(0.06), radius: 5, x: 0, y: 10)
+    }
+}
+
+struct BlurView: UIViewRepresentable {
+    var style: UIBlurEffect.Style
+
+    func makeUIView(context: Context) -> UIVisualEffectView {
+        UIVisualEffectView(effect: UIBlurEffect(style: style))
+    }
+
+    func updateUIView(_ uiView: UIVisualEffectView, context: Context) {}
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = 0
+    var corners: UIRectCorner = .allCorners
+
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(
+            roundedRect: rect,
+            byRoundingCorners: corners,
+            cornerRadii: CGSize(width: radius, height: radius)
+        )
+        return Path(path.cgPath)
+    }
+}
+
+#Preview {
+    ZStack {
+        Color(white: 0.97).ignoresSafeArea()
+        VStack(spacing: 20) {
+            OutfitSuggestionCardView(type: .casual)
+            OutfitSuggestionCardView(type: .work)
+        }
+        .padding(.horizontal, 20)
     }
 }

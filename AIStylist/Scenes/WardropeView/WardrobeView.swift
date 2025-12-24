@@ -17,42 +17,50 @@ struct WardrobeView: View {
     }
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 16) {
-                header
+        ZStack(alignment: .bottomTrailing) {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 16) {
+                    header
 
-                WardrobeCategoryTabs(
-                    selected: $selectedCategory,
-                    categories: WardrobeCategory.allCases
-                )
-
-                if filteredItems.isEmpty {
-                    EmptyStateView(
-                        title: "No items yet",
-                        subtitle: "Add your first clothing item to start building your wardrobe."
+                    WardrobeCategoryTabs(
+                        selected: $selectedCategory,
+                        categories: WardrobeCategory.allCases
                     )
-                    .padding(.top, 12)
-                } else {
-                    LazyVGrid(
-                        columns: WardrobeLayout.columns,
-                        alignment: .center,
-                        spacing: WardrobeLayout.gridSpacing
-                    ) {
-                        ForEach(filteredItems) { item in
-                            WardrobeItemCard(
-                                item: item,
-                                onToggleFavorite: { toggleFavorite(for: item.id) }
-                            )
+
+                    if filteredItems.isEmpty {
+                        EmptyStateView(
+                            title: "No items yet",
+                            subtitle: "Add your first clothing item to start building your wardrobe."
+                        )
+                        .padding(.top, 12)
+                    } else {
+                        LazyVGrid(
+                            columns: WardrobeLayout.columns,
+                            alignment: .center,
+                            spacing: WardrobeLayout.gridSpacing
+                        ) {
+                            ForEach(filteredItems) { item in
+                                WardrobeItemCard(
+                                    item: item,
+                                    onToggleFavorite: { toggleFavorite(for: item.id) }
+                                )
+                            }
                         }
+                        .padding(.top, 4)
                     }
-                    .padding(.top, 4)
                 }
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 28)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 28)
+            .background(Color(.systemGroupedBackground))
+
+            FloatingCreateButton {
+                // TODO: navigate to Create
+            }
+            .padding(.trailing, 20)
+            .padding(.bottom, 15)
         }
-        .background(Color(.systemGroupedBackground))
     }
 
     private var header: some View {
