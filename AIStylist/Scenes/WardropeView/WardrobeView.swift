@@ -42,7 +42,7 @@ struct WardrobeView: View {
                             ForEach(filteredItems) { item in
                                 WardrobeItemCard(
                                     item: item,
-                                    onToggleFavorite: { toggleFavorite(for: item.id) }
+                                    onToggleFavorite: { toggleFavorite(for: item.id) }, onTap: nil
                                 )
                             }
                         }
@@ -61,11 +61,12 @@ struct WardrobeView: View {
             .padding(.trailing, 20)
             .padding(.bottom, 15)
         }
+        .ignoresSafeArea(edges: .top)
     }
 
     private var header: some View {
         HStack(alignment: .center) {
-            Text("My Wardrobe")
+            Text("Wardrobe")
                 .font(.system(size: 32, weight: .bold))
                 .foregroundStyle(.primary)
 

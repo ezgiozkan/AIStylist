@@ -9,11 +9,16 @@ import SwiftUI
 
 struct WardrobeItemCard: View {
     let item: WardrobeItem
-    let onToggleFavorite: () -> Void
+
+    var isSelected: Bool = false
+    var isSelectionEnabled: Bool = false
+
+    let onToggleFavorite: (() -> Void)?
+    let onTap: (() -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            ZStack(alignment: .topTrailing) {
+            ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: WardrobeLayout.cardInnerCornerRadius, style: .continuous)
                     .fill(Color(.secondarySystemBackground))
                     .overlay(
@@ -24,20 +29,18 @@ struct WardrobeItemCard: View {
                     .frame(height: WardrobeLayout.imageHeight)
                     .clipShape(RoundedRectangle(cornerRadius: WardrobeLayout.cardInnerCornerRadius, style: .continuous))
 
-                Button {
-                    onToggleFavorite()
-                } label: {
+                if isSelectionEnabled {
                     ZStack {
-                        Circle().fill(Color.black.opacity(0.25))
+                        Circle()
+                            .fill(isSelected ? Color.buttonPrimary : Color.black.opacity(0.10))
 
-                        Image(systemName: item.isFavorite ? "heart.fill" : "heart")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.white)
+                        Image(systemName: "checkmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(isSelected ? Color.white : Color.clear)
                     }
                     .frame(width: 28, height: 28)
+                    .padding(10)
                 }
-                .buttonStyle(.plain)
-                .padding(10)
             }
 
             VStack(alignment: .leading, spacing: 4) {
@@ -60,7 +63,10 @@ struct WardrobeItemCard: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: WardrobeLayout.cardCornerRadius, style: .continuous)
-                .stroke(Color.black.opacity(0.06), lineWidth: 1)
+                .stroke(isSelectionEnabled && isSelected ? Color.buttonPrimary : Color.black.opacity(0.06),
+                        lineWidth: isSelectionEnabled && isSelected ? 2 : 1)
         )
+        .contentShape(RoundedRectangle(cornerRadius: WardrobeLayout.cardCornerRadius, style: .continuous))
+        .onTapGesture { onTap?() }
     }
 }
