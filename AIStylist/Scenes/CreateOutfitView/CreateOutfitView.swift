@@ -5,63 +5,42 @@
 //  Created by Ezgi Özkan on 21.12.2025.
 //
 
+
 import SwiftUI
 import PhotosUI
 import AVFoundation
 import Photos
 
 struct CreateOutfitView: View {
-    private enum UI {
-        static let horizontalPadding: CGFloat = 20
-        static let buttonCornerRadius: CGFloat = 28
-        static let bottomInsetPadding: CGFloat = 12
-    }
-
-    @State private var isAddPhotoPickerPresented = false
-    @State private var addPhotoPickerDragOffset: CGFloat = 0
-    @State private var isImagePickerPresented = false
-    @State private var imagePickerSourceType: UIImagePickerController.SourceType = .photoLibrary
-    @State private var selectedImage: UIImage?
-    @State private var imageToAnalyze: UIImage?
-    @State private var isAnalyzePresented = false
-
-    private func onAnalyzePressed() {
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.9)) {
-            isAddPhotoPickerPresented = true
-        }
-    }
-
-    private func dismissAddPhotoPicker() {
-        isAddPhotoPickerPresented = false
-        addPhotoPickerDragOffset = 0
-    }
+    @EnvironmentObject private var authVM: AuthViewModel
+    @StateObject private var viewModel = CreateOutfitViewModel()
 
     private var addPhotoPicker: some View {
         AddPhotoBottomSheet(
             onTakePhoto: {
-                requestCameraPermissionAndPresent()
+                viewModel.requestCameraPermissionAndPresent()
             },
             onChooseFromGallery: {
-                requestPhotoLibraryPermissionAndPresent()
+                viewModel.requestPhotoLibraryPermissionAndPresent()
             }
         )
         .frame(maxWidth: .infinity)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .offset(y: max(0, addPhotoPickerDragOffset))
+        .offset(y: max(0, viewModel.addPhotoPickerDragOffset))
         .gesture(
             DragGesture()
                 .onChanged { value in
                     if value.translation.height > 0 {
-                        addPhotoPickerDragOffset = value.translation.height
+                        viewModel.addPhotoPickerDragOffset = value.translation.height
                     }
                 }
                 .onEnded { value in
                     if value.translation.height > 120 {
-                        dismissAddPhotoPicker()
+                        viewModel.dismissAddPhotoPicker()
                     } else {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.9)) {
-                            addPhotoPickerDragOffset = 0
+                            viewModel.addPhotoPickerDragOffset = 0
                         }
                     }
                 }
@@ -70,51 +49,6 @@ struct CreateOutfitView: View {
         .frame(maxWidth: .infinity, alignment: .center)
         .padding(.horizontal, 0)
         .padding(.bottom, 0)
-    }
-
-    private func requestCameraPermissionAndPresent() {
-        guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
-            return
-        }
-
-        switch AVCaptureDevice.authorizationStatus(for: .video) {
-        case .authorized:
-            presentImagePicker(source: .camera)
-        case .notDetermined:
-            AVCaptureDevice.requestAccess(for: .video) { granted in
-                DispatchQueue.main.async {
-                    if granted {
-                        presentImagePicker(source: .camera)
-                    }
-                }
-            }
-        default:
-            break
-        }
-    }
-
-    private func requestPhotoLibraryPermissionAndPresent() {
-        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
-        switch status {
-        case .authorized, .limited:
-            presentImagePicker(source: .photoLibrary)
-        case .notDetermined:
-            PHPhotoLibrary.requestAuthorization(for: .readWrite) { newStatus in
-                DispatchQueue.main.async {
-                    if newStatus == .authorized || newStatus == .limited {
-                        presentImagePicker(source: .photoLibrary)
-                    }
-                }
-            }
-        default:
-            break
-        }
-    }
-
-    private func presentImagePicker(source: UIImagePickerController.SourceType) {
-        imagePickerSourceType = source
-        dismissAddPhotoPicker()
-        isImagePickerPresented = true
     }
 
     var body: some View {
@@ -169,7 +103,7 @@ struct CreateOutfitView: View {
                             subtitle: "We identify every clothing item and accessory automatically"
                         )
                     }
-                    .padding(.horizontal, UI.horizontalPadding)
+                    .padding(.horizontal, CreateOutfitConstants.horizontalPadding)
 
                     VStack(alignment: .leading, spacing: 10) {
                         Text("FOR BEST RESULTS")
@@ -183,7 +117,7 @@ struct CreateOutfitView: View {
                     .padding(.horizontal, 24)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Button(action: onAnalyzePressed) {
+                    Button(action: { withAnimation(.spring(response: 0.3, dampingFraction: 0.9)) { viewModel.showAddPhotoPicker() } }) {
                         HStack(spacing: 10) {
                             Image(systemName: "viewfinder")
                                 .font(.system(size: 17, weight: .semibold))
@@ -194,20 +128,20 @@ struct CreateOutfitView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
                         .background(Color.buttonPrimary)
-                        .cornerRadius(UI.buttonCornerRadius)
+                        .cornerRadius(CreateOutfitConstants.buttonCornerRadius)
                     }
-                    .padding(.horizontal, UI.horizontalPadding)
+                    .padding(.horizontal, CreateOutfitConstants.horizontalPadding)
                     .padding(.top, 12)
                 }
                 .padding(.bottom, 36)
             }
             .background(Color(.systemBackground))
 
-            if isAddPhotoPickerPresented {
+            if viewModel.isAddPhotoPickerPresented {
                 Color.black.opacity(0.35)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        dismissAddPhotoPicker()
+                        viewModel.dismissAddPhotoPicker()
                     }
 
                 VStack(spacing: 0) {
@@ -219,61 +153,33 @@ struct CreateOutfitView: View {
                 .transition(.move(edge: .bottom))
                 .zIndex(1)
             }
+
+            if viewModel.isPreparingImagePicker {
+                Color.black.opacity(0.15)
+                    .ignoresSafeArea()
+                    .zIndex(2)
+
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .scaleEffect(1.15)
+                    .zIndex(3)
+            }
         }
-        .sheet(isPresented: $isImagePickerPresented) {
-            ImagePicker(sourceType: imagePickerSourceType, selectedImage: $selectedImage)
+        .sheet(isPresented: $viewModel.isImagePickerPresented, onDismiss: {
+            viewModel.handleImagePickerDismiss()
+            viewModel.isPreparingImagePicker = false
+        }) {
+            ImagePicker(sourceType: viewModel.imagePickerSourceType, selectedImage: $viewModel.selectedImage)
                 .ignoresSafeArea()
         }
-        .onChange(of: selectedImage) { newValue in
-            guard let newValue else { return }
-            imageToAnalyze = newValue
-            isAnalyzePresented = true
+        .onChange(of: viewModel.selectedImage) { newValue in
+            viewModel.handleSelectedImageChange(newValue)
+            viewModel.isPreparingImagePicker = false
         }
-        .fullScreenCover(isPresented: $isAnalyzePresented) {
-            if let imageToAnalyze {
-                AnalyzeView(image: imageToAnalyze, onCancel: {
-                    isAnalyzePresented = false
-                })
-            }
-        }
-    }
-}
-
-
-private struct ImagePicker: UIViewControllerRepresentable {
-    let sourceType: UIImagePickerController.SourceType
-    @Binding var selectedImage: UIImage?
-
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.sourceType = sourceType
-        picker.allowsEditing = false
-        picker.delegate = context.coordinator
-        return picker
-    }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(selectedImage: $selectedImage)
-    }
-
-    final class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        @Binding var selectedImage: UIImage?
-
-        init(selectedImage: Binding<UIImage?>) {
-            _selectedImage = selectedImage
-        }
-
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                selectedImage = image
-            }
-            picker.dismiss(animated: true)
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            picker.dismiss(animated: true)
+        .fullScreenCover(item: $viewModel.analyzePayload) { payload in
+            AnalyzeView(image: payload.image, accessToken: authVM.accessToken, onCancel: {
+                viewModel.clearAnalyzePayload()
+            })
         }
     }
 }

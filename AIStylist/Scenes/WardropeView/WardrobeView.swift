@@ -8,60 +8,66 @@
 import SwiftUI
 
 struct WardrobeView: View {
-    @State private var selectedCategory: WardrobeCategory = .all
-    @State private var items: [WardrobeItem] = WardrobeItem.demo
-
-    private var filteredItems: [WardrobeItem] {
-        guard selectedCategory != .all else { return items }
-        return items.filter { $0.category == selectedCategory }
-    }
+    @StateObject private var viewModel = WardrobeViewModel()
+    @State private var showCreateOutfit = false
 
     var body: some View {
-        ZStack(alignment: .bottomTrailing) {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 16) {
-                    header
+        NavigationView {
+            ZStack(alignment: .bottomTrailing) {
 
-                    WardrobeCategoryTabs(
-                        selected: $selectedCategory,
-                        categories: WardrobeCategory.allCases
-                    )
+                NavigationLink(
+                    destination: CreateOutfitView().hideTabBarOnPush(),
+                    isActive: $showCreateOutfit,
+                    label: { EmptyView() }
+                )
+                .hidden()
 
-                    if filteredItems.isEmpty {
-                        EmptyStateView(
-                            title: "No items yet",
-                            subtitle: "Add your first clothing item to start building your wardrobe."
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 16) {
+                        header
+
+                        WardrobeCategoryTabs(
+                            selected: $viewModel.selectedCategory,
+                            categories: WardrobeCategory.allCases
                         )
-                        .padding(.top, 12)
-                    } else {
-                        LazyVGrid(
-                            columns: WardrobeLayout.columns,
-                            alignment: .center,
-                            spacing: WardrobeLayout.gridSpacing
-                        ) {
-                            ForEach(filteredItems) { item in
-                                WardrobeItemCard(
-                                    item: item,
-                                    onToggleFavorite: { toggleFavorite(for: item.id) }, onTap: nil
-                                )
-                            }
-                        }
-                        .padding(.top, 4)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 28)
-            }
-            .background(Color(.systemGroupedBackground))
 
-            FloatingCreateButton {
-                // TODO: navigate to Create
+                        if viewModel.filteredItems.isEmpty {
+                            EmptyStateView(
+                                title: "No items yet",
+                                subtitle: "Add your first clothing item to start building your wardrobe."
+                            )
+                            .padding(.top, 12)
+                        } else {
+                            LazyVGrid(
+                                columns: WardrobeLayout.columns,
+                                alignment: .center,
+                                spacing: WardrobeLayout.gridSpacing
+                            ) {
+                                ForEach(viewModel.filteredItems) { item in
+                                    WardrobeItemCard(
+                                        item: item,
+                                        onToggleFavorite: { viewModel.toggleFavorite(for: item.id) },
+                                        onTap: nil
+                                    )
+                                }
+                            }
+                            .padding(.top, 4)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
+                    .padding(.bottom, 28)
+                }
+                .background(Color(.systemGroupedBackground))
+
+                FloatingCreateButton {
+                    showCreateOutfit = true
+                }
+                .padding(.trailing, 20)
+                .padding(.bottom, 15)
             }
-            .padding(.trailing, 20)
-            .padding(.bottom, 15)
         }
-        .ignoresSafeArea(edges: .top)
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 
     private var header: some View {
@@ -74,10 +80,6 @@ struct WardrobeView: View {
         }
     }
 
-    private func toggleFavorite(for id: UUID) {
-        guard let index = items.firstIndex(where: { $0.id == id }) else { return }
-        items[index].isFavorite.toggle()
-    }
 }
 
 #Preview {

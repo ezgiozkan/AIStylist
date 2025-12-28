@@ -12,4 +12,5 @@ enum Step: Int {
     case detectingItems
     case generatingLookbook
     case completed
+    case failed
 }

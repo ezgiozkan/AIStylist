@@ -12,6 +12,7 @@ struct AIStylistApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .preferredColorScheme(.light)
         }
     }
 }

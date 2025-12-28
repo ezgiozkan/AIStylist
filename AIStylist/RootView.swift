@@ -6,38 +6,30 @@
 //
 
 import SwiftUI
-import CoreLocation
 
 struct RootView: View {
-    @State private var selectedTab: AppTab = .home
-    @State private var showCreate = false
+    @StateObject private var authVM = AuthViewModel()
+    @State private var didCheckInitialSession = false
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            HomeView().tag(AppTab.home)
-            WardrobeView().tag(AppTab.wardrobe)
-            TravelView().tag(AppTab.travel)
-            ProfileView().tag(AppTab.profile)
+        Group {
+            if !didCheckInitialSession {
+                Color.clear
+            } else if authVM.signedInUser != nil {
+                TabBarView()
+                    .environmentObject(authVM)
+            } else {
+                SplashView()
+                    .environmentObject(authVM)
+            }
         }
-        .modifier(HideSystemTabBarCompat())
-        .safeAreaInset(edge: .bottom) {
-            TabBarView()
-        }
-        .sheet(isPresented: $showCreate) {
-            CreateOutfitView()
-        }
-    }
-}
-
-private struct HideSystemTabBarCompat: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 16.0, *) {
-            content
-                .toolbar(.hidden, for: .tabBar)
-        } else {
-            content
-                .onAppear { UITabBar.appearance().isHidden = true }
-                .onDisappear { UITabBar.appearance().isHidden = false }
+        .onAppear {
+            Task {
+                await authVM.loadInitialUserIfAvailable()
+                await MainActor.run {
+                    didCheckInitialSession = true
+                }
+            }
         }
     }
 }

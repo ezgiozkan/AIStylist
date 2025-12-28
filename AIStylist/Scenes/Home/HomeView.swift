@@ -11,6 +11,8 @@ struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var showWardrobePicker = false
     @State private var showCalendar = false
+    @State private var showCreateOutfit = false
+    @EnvironmentObject var authVM: AuthViewModel
 
     var body: some View {
         NavigationView {
@@ -23,10 +25,17 @@ struct HomeView: View {
                     label: { EmptyView() }
                 )
                 .hidden()
-                
+
                 NavigationLink(
                     destination: OutfitCalendarView().hideTabBarOnPush(),
                     isActive: $showCalendar,
+                    label: { EmptyView() }
+                )
+                .hidden()
+
+                NavigationLink(
+                    destination: CreateOutfitView().hideTabBarOnPush(),
+                    isActive: $showCreateOutfit,
                     label: { EmptyView() }
                 )
                 .hidden()
@@ -99,7 +108,7 @@ struct HomeView: View {
             }
             .safeAreaInset(edge: .bottom, alignment: .trailing) {
                 FloatingCreateButton {
-                    // TODO: navigate to Create
+                    showCreateOutfit = true
                 }
                 .padding(.trailing, 20)
                 .padding(.bottom, 12)
@@ -112,18 +121,82 @@ struct HomeView: View {
     }
 
 
+    var headerView: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Hello, \((authVM.signedInUser?.fullName?.split(separator: " ").first.map(String.init)) ?? "there")")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundStyle(HomeViewConstants.primaryText)
+
+                Text("What’s your style today?")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(HomeViewConstants.secondaryText)
+            }
+
+            Spacer()
+
+            Group {
+                if let urlString = authVM.signedInUser?.avatarURL,
+                   let url = URL(string: urlString) {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        default:
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .foregroundStyle(HomeViewConstants.primaryText)
+                        }
+                    }
+                } else {
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundStyle(HomeViewConstants.primaryText)
+                }
+            }
+            .frame(width: 40, height: 40)
+            .clipShape(Circle())
+        }
+        .padding(.horizontal, 20)
+    }
+
+
     var weatherRow: some View {
         HStack(spacing: 10) {
-            Image(systemName: "sun.max")
-                .font(.system(size: 16, weight: .medium))
-                .foregroundStyle(Color.purple.opacity(0.75))
+            if viewModel.isWeatherLoading {
+                RoundedRectangle(cornerRadius: 6)
+                    .frame(width: 18, height: 18)
+                    .foregroundStyle(Color.purple.opacity(0.18))
 
-            Text(viewModel.weatherText)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(HomeViewConstants.primaryText)
+                RoundedRectangle(cornerRadius: 8)
+                    .frame(width: 220, height: 18)
+                    .foregroundStyle(HomeViewConstants.primaryText.opacity(0.12))
+            } else {
+                Image(systemName: viewModel.weatherSymbol)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Color.purple.opacity(0.75))
+
+                Text(viewModel.weatherText)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(HomeViewConstants.primaryText)
+            }
 
             Spacer()
         }
         .padding(.horizontal, 20)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.isWeatherLoading)
     }
 }
+
+#if DEBUG
+struct HomeView_Previews: PreviewProvider {
+    static var previews: some View {
+        HomeView()
+            .environmentObject(AuthViewModel())
+    }
+}
+#endif

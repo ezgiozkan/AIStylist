@@ -12,10 +12,15 @@ struct WardrobePickerView: View {
     @State private var selectedCategory: WardrobeCategory = .all
     @State private var items: [WardrobeItem] = WardrobeItem.demo
     @State private var selectedIDs: Set<UUID> = []
+    @State private var isCanvasPresented = false
 
     private var filteredItems: [WardrobeItem] {
         guard selectedCategory != .all else { return items }
         return items.filter { $0.category == selectedCategory }
+    }
+
+    private var selectedItems: [WardrobeItem] {
+        items.filter { selectedIDs.contains($0.id) }
     }
 
     var body: some View {
@@ -51,11 +56,19 @@ struct WardrobePickerView: View {
         .navigationTitle("Select items")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Text("\(selectedIDs.count)")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(Color.buttonPrimary)
+
+                Button("Next") {
+                    isCanvasPresented = true
+                }
+                .disabled(selectedIDs.isEmpty)
             }
+        }
+        .fullScreenCover(isPresented: $isCanvasPresented) {
+            OutfitCanvasView(items: selectedItems)
         }
     }
 

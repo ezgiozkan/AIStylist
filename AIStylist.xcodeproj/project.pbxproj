@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		66E403DE2EF8A8D0004BA1E9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 66E403DD2EF8A8D0004BA1E9 /* Alamofire */; };
+		66E71BF92F01706F0005E942 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71BF82F01706F0005E942 /* Auth */; };
+		66E71BFB2F01706F0005E942 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71BFA2F01706F0005E942 /* Functions */; };
+		66E71BFD2F01706F0005E942 /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71BFC2F01706F0005E942 /* PostgREST */; };
+		66E71BFF2F01706F0005E942 /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71BFE2F01706F0005E942 /* Realtime */; };
+		66E71C012F01706F0005E942 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71C002F01706F0005E942 /* Storage */; };
+		66E71C032F01706F0005E942 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71C022F01706F0005E942 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,9 +39,22 @@
 		660CCA292EBBC3B700E8650A /* AIStylistUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIStylistUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		66E71C082F0179ED0005E942 /* Exceptions for "AIStylist" folder in "AIStylist" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 660CCA112EBBC3B500E8650A /* AIStylist */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		660CCA142EBBC3B500E8650A /* AIStylist */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				66E71C082F0179ED0005E942 /* Exceptions for "AIStylist" folder in "AIStylist" target */,
+			);
 			path = AIStylist;
 			sourceTree = "<group>";
 		};
@@ -56,6 +75,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66E71C032F01706F0005E942 /* Supabase in Frameworks */,
+				66E71C012F01706F0005E942 /* Storage in Frameworks */,
+				66E71BFD2F01706F0005E942 /* PostgREST in Frameworks */,
+				66E71BFB2F01706F0005E942 /* Functions in Frameworks */,
+				66E71BF92F01706F0005E942 /* Auth in Frameworks */,
+				66E71BFF2F01706F0005E942 /* Realtime in Frameworks */,
 				66E403DE2EF8A8D0004BA1E9 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -126,6 +151,12 @@
 			name = AIStylist;
 			packageProductDependencies = (
 				66E403DD2EF8A8D0004BA1E9 /* Alamofire */,
+				66E71BF82F01706F0005E942 /* Auth */,
+				66E71BFA2F01706F0005E942 /* Functions */,
+				66E71BFC2F01706F0005E942 /* PostgREST */,
+				66E71BFE2F01706F0005E942 /* Realtime */,
+				66E71C002F01706F0005E942 /* Storage */,
+				66E71C022F01706F0005E942 /* Supabase */,
 			);
 			productName = AIStylist;
 			productReference = 660CCA122EBBC3B500E8650A /* AIStylist.app */;
@@ -211,6 +242,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				66E403DB2EF8A860004BA1E9 /* XCRemoteSwiftPackageReference "Alamofire" */,
+				66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 660CCA132EBBC3B500E8650A /* Products */;
@@ -417,6 +449,7 @@
 				DEVELOPMENT_TEAM = 6U8Z5D3W4M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AIStylist/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access so you can take a photo to analyze your outfit.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location to show local weather and outfit suggestions.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need access to save photos if you choose to export or save results.";
@@ -450,6 +483,7 @@
 				DEVELOPMENT_TEAM = 6U8Z5D3W4M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = AIStylist/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access so you can take a photo to analyze your outfit.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location to show local weather and outfit suggestions.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need access to save photos if you choose to export or save results.";
@@ -595,6 +629,14 @@
 				minimumVersion = 5.11.0;
 			};
 		};
+		66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -602,6 +644,36 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 66E403DB2EF8A860004BA1E9 /* XCRemoteSwiftPackageReference "Alamofire" */;
 			productName = Alamofire;
+		};
+		66E71BF82F01706F0005E942 /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		66E71BFA2F01706F0005E942 /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		66E71BFC2F01706F0005E942 /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		66E71BFE2F01706F0005E942 /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		66E71C002F01706F0005E942 /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
+		66E71C022F01706F0005E942 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

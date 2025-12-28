@@ -10,10 +10,19 @@ import SwiftUI
 struct AnalyzeView: View {
     let image: UIImage
     var onCancel: (() -> Void)?
+    private let accessToken: String?
 
-    @StateObject private var viewModel = AnalyzeViewModel()
+    @StateObject private var viewModel: AnalyzeViewModel
     @State private var scanProgress: CGFloat = 0
     @State private var isAnimatingScan = false
+    @SwiftUI.Environment(\.dismiss) private var dismiss
+
+    init(image: UIImage, accessToken: String?, onCancel: (() -> Void)? = nil) {
+        self.image = image
+        self.accessToken = accessToken
+        self.onCancel = onCancel
+        _viewModel = StateObject(wrappedValue: AnalyzeViewModel(accessToken: accessToken))
+    }
 
     var body: some View {
         ZStack {
@@ -47,6 +56,23 @@ struct AnalyzeView: View {
 
                 Spacer(minLength: 0)
             }
+
+            Button {
+                onCancel?()
+                dismiss()
+            } label: {
+                Image(systemName: "xmark")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.primary)
+                    .frame(width: 36, height: 36)
+                    .background(Circle().fill(Color(.systemBackground).opacity(0.9)))
+                    .overlay(Circle().stroke(Color.primary.opacity(0.08), lineWidth: 1))
+            }
+            .accessibilityLabel("Close")
+            .padding(.top, 12)
+            .padding(.trailing, 16)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+            .zIndex(10)
         }
         .onAppear {
             viewModel.start(image: image)
@@ -138,35 +164,45 @@ struct AnalyzeView: View {
     private var steps: some View {
         VStack(spacing: 18) {
             stepRow(
-                icon: stepIcon(for: .imageUploaded),
+                icon: stepIcon(for: Step.imageUploaded),
                 title: "Image uploaded",
                 subtitle: stepSubtitle(for: Step.imageUploaded),
                 isActive: viewModel.step == Step.imageUploaded,
-                isDone: viewModel.step.rawValue > Step.imageUploaded.rawValue
+                isDone: stepIndex(viewModel.step) > stepIndex(Step.imageUploaded)
             )
 
             stepRow(
-                icon: stepIcon(for: .detectingItems),
+                icon: stepIcon(for: Step.detectingItems),
                 title: "Detecting items",
-                subtitle: stepSubtitle(for: .detectingItems),
-                isActive: viewModel.step == .detectingItems,
-                isDone: viewModel.step.rawValue > Step.detectingItems.rawValue
+                subtitle: stepSubtitle(for: Step.detectingItems),
+                isActive: viewModel.step == Step.detectingItems,
+                isDone: stepIndex(viewModel.step) > stepIndex(Step.detectingItems)
             )
 
             stepRow(
-                icon: stepIcon(for: .generatingLookbook),
+                icon: stepIcon(for: Step.generatingLookbook),
                 title: "Generating lookbook",
-                subtitle: stepSubtitle(for: .generatingLookbook),
-                isActive: viewModel.step == .generatingLookbook,
-                isDone: viewModel.step.rawValue > Step.generatingLookbook.rawValue
+                subtitle: stepSubtitle(for: Step.generatingLookbook),
+                isActive: viewModel.step == Step.generatingLookbook,
+                isDone: stepIndex(viewModel.step) > stepIndex(Step.generatingLookbook)
             )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 8)
     }
 
+    private func stepIndex(_ step: Step) -> Int {
+        switch step {
+        case .imageUploaded: return 0
+        case .detectingItems: return 1
+        case .generatingLookbook: return 2
+        case .completed: return 3
+        case .failed: return 4
+        }
+    }
+
     private func stepIcon(for step: Step) -> AnyView {
-        if viewModel.step.rawValue > step.rawValue {
+        if stepIndex(viewModel.step) > stepIndex(step) {
             return AnyView(
                 ZStack {
                     Circle().fill(Color.purple.opacity(0.16)).frame(width: 24, height: 24)
@@ -194,7 +230,7 @@ struct AnalyzeView: View {
     }
 
     private func stepSubtitle(for step: Step) -> String {
-        if viewModel.step.rawValue > step.rawValue {
+        if stepIndex(viewModel.step) > stepIndex(step) {
             return "Done"
         }
         if viewModel.step == step {
@@ -277,5 +313,5 @@ private extension View {
 }
 
 #Preview {
-    AnalyzeView(image: UIImage(systemName: "person.fill") ?? UIImage(), onCancel: nil)
+    AnalyzeView(image: UIImage(systemName: "person.fill") ?? UIImage(), accessToken: nil, onCancel: nil)
 }

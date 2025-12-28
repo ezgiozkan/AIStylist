@@ -5,7 +5,7 @@
 //  Created by Ezgi Özkan on 24.12.2025.
 //
 
-import Foundation
+import SwiftUI
 
 struct WardrobeItem: Identifiable {
     let id: UUID
@@ -14,14 +14,23 @@ struct WardrobeItem: Identifiable {
     var isFavorite: Bool
     let imageName: String
 
-    static let demo: [WardrobeItem] = [
-        .init(id: UUID(), title: "Classic Trench", category: .outerwear, isFavorite: false, imageName: "tshirt"),
-        .init(id: UUID(), title: "Slim Fit Jeans", category: .bottoms, isFavorite: true, imageName: "jeans"),
-        .init(id: UUID(), title: "White Linen Shirt", category: .tops, isFavorite: false, imageName: "shirt"),
-        .init(id: UUID(), title: "Leather Boots", category: .shoes, isFavorite: true, imageName: "boot"),
-        .init(id: UUID(), title: "Silk Scarf", category: .tops, isFavorite: false, imageName: "scarf"),
-        .init(id: UUID(), title: "Basic Tee", category: .tops, isFavorite: false, imageName: "tshirt"),
-    ]
+    var image: UIImage {
+        UIImage(named: imageName) ?? UIImage()
+    }
+
+    init(
+        id: UUID = UUID(),
+        title: String,
+        category: WardrobeCategory,
+        isFavorite: Bool = false,
+        imageName: String
+    ) {
+        self.id = id
+        self.title = title
+        self.category = category
+        self.isFavorite = isFavorite
+        self.imageName = imageName
+    }
 }
 
 extension WardrobeItem {
@@ -34,4 +43,27 @@ extension WardrobeItem {
        default: return "tshirt"
        }
    }
+}
+
+struct CanvasItem: Identifiable {
+    let id: UUID
+    let image: UIImage
+
+    var offset: CGSize = .zero
+    var scale: CGFloat = 1
+    var rotation: Angle = .zero
+    var zIndex: Double = 0
+}
+
+// MARK: - Demo Data
+
+extension WardrobeItem {
+    static let demo: [WardrobeItem] = [
+        .init(title: "Classic Trench", category: .outerwear, imageName: "tshirt"),
+        .init(title: "Slim Fit Jeans", category: .bottoms, isFavorite: true, imageName: "jeans"),
+        .init(title: "White Linen Shirt", category: .tops, imageName: "shirt"),
+        .init(title: "Leather Boots", category: .shoes, isFavorite: true, imageName: "boot"),
+        .init(title: "Silk Scarf", category: .tops, imageName: "scarf"),
+        .init(title: "Basic Tee", category: .tops, imageName: "tshirt")
+    ]
 }

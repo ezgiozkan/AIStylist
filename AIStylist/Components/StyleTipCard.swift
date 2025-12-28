@@ -26,7 +26,7 @@ struct StyleTipCard: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text("STYLE TIP")
                     .font(.system(size: 16, weight: .bold))
-                    .foregroundStyle(Color.gray)
+                    .foregroundStyle(Color.black)
                   
 
                 Text(tip)

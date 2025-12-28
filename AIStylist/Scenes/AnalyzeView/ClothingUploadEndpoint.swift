@@ -10,12 +10,24 @@ import Foundation
 enum ClothingUploadEndpoint {
     static let baseURL = URL(string: "https://ai-stylist-production.up.railway.app")!
 
-    static var upload: Endpoint {
-        Endpoint(
+    static func upload(authToken: String?) -> Endpoint {
+        var headers: [String: String] = [
+            "accept": "application/json"
+        ]
+
+        if let authToken, !authToken.isEmpty {
+            headers["Authorization"] = "Bearer \(authToken)"
+        }
+
+        return Endpoint(
             baseURL: baseURL,
             path: "/upload-clothing",
             method: .post,
-            headers: ["accept": "application/json"]
+            headers: headers
         )
+    }
+
+    static var upload: Endpoint {
+        upload(authToken: nil)
     }
 }

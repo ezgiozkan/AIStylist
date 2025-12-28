@@ -1,5 +1,5 @@
 //
-//  WeatherServiceManager.swift
+//  WeatherService.swift
 //  AIStylist
 //
 //  Created by Ezgi Özkan on 21.12.2025.
@@ -7,43 +7,29 @@
 
 import Foundation
 
-struct WeatherDTO: Decodable {
-    let currentWeather: CurrentWeather
-
-    enum CodingKeys: String, CodingKey {
-        case currentWeather = "current_weather"
-    }
-
-    struct CurrentWeather: Decodable {
-        let temperature: Double
-        let windspeed: Double
-        let weathercode: Int
-    }
-}
-
 protocol WeatherServicing {
     func fetchCurrent(lat: Double, lon: Double) async throws -> WeatherDTO
 }
 
 final class WeatherService: WeatherServicing {
-    private let client: ApiClient
-    private let baseURL = URL(string: "https://api.open-meteo.com")!
-
-    init(client: ApiClient = URLSessionHTTPClient()) {
-        self.client = client
-    }
-
     func fetchCurrent(lat: Double, lon: Double) async throws -> WeatherDTO {
-        let endpoint = Endpoint(
-            baseURL: baseURL,
-            path: "/v1/forecast",
-            method: .get,
-            query: [
-                .init(name: "latitude", value: "\(lat)"),
-                .init(name: "longitude", value: "\(lon)"),
-                .init(name: "current_weather", value: "true")
-            ]
-        )
-        return try await client.send(endpoint, as: WeatherDTO.self)
+        var components = URLComponents(string: "https://api.open-meteo.com/v1/forecast")
+        components?.queryItems = [
+            .init(name: "latitude", value: String(lat)),
+            .init(name: "longitude", value: String(lon)),
+            .init(name: "current", value: "temperature_2m,wind_speed_10m,weather_code"),
+            .init(name: "timezone", value: "auto")
+        ]
+
+        guard let url = components?.url else {
+            throw URLError(.badURL)
+        }
+
+        let (data, response) = try await URLSession.shared.data(from: url)
+        if let http = response as? HTTPURLResponse, !(200...299).contains(http.statusCode) {
+            throw URLError(.badServerResponse)
+        }
+
+        return try JSONDecoder().decode(WeatherDTO.self, from: data)
     }
 }
