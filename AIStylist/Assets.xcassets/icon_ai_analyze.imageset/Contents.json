@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon_ai_analyze.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

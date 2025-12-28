@@ -12,7 +12,10 @@ struct HomeView: View {
     @State private var showWardrobePicker = false
     @State private var showCalendar = false
     @State private var showCreateOutfit = false
+    @State private var showTravel = false
+    @State private var showRecommendOutfit = false
     @EnvironmentObject var authVM: AuthViewModel
+    @AppStorage("aiStylist_currentTab") private var currentTab: Int = AppTab.home.rawValue
 
     var body: some View {
         NavigationView {
@@ -36,6 +39,20 @@ struct HomeView: View {
                 NavigationLink(
                     destination: CreateOutfitView().hideTabBarOnPush(),
                     isActive: $showCreateOutfit,
+                    label: { EmptyView() }
+                )
+                .hidden()
+
+                NavigationLink(
+                    destination: TravelView().hideTabBarOnPush(),
+                    isActive: $showTravel,
+                    label: { EmptyView() }
+                )
+                .hidden()
+
+                NavigationLink(
+                    destination: RecommendOutfitView().hideTabBarOnPush(),
+                    isActive: $showRecommendOutfit,
                     label: { EmptyView() }
                 )
                 .hidden()
@@ -71,11 +88,11 @@ struct HomeView: View {
 
                             HStack(spacing: 16) {
                                 ActionCardView(type: .occasion) {
-                                    // navigate to Plan an Occasion
+                                    showRecommendOutfit = true
                                 }
 
                                 ActionCardView(type: .travel) {
-                                    // navigate to Travel Capsule
+                                    showTravel = true
                                 }
                             }
                             .padding(.horizontal, 20)

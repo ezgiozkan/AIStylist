@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum AppTab: Hashable {
+enum AppTab: Int {
     case home
     case wardrobe
     case create
