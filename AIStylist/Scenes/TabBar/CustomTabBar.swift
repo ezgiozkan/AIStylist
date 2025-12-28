@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct TabBarView: View {
 
@@ -83,31 +84,25 @@ struct TabBarView: View {
                 }
             }
 
-            CreateOptionsBottomSheet(isPresented: $showCreateOptionsSheet) { option in
-                switch option {
-                case .planOccasion:
-                    selectedTab = .home
-                case .travelCapsule:
-                    selectedTab = .travel
-                case .addClothes:
+            CreateOptionsBottomSheet(
+                isPresented: $showCreateOptionsSheet,
+                onAddClothes: {
                     selectedTab = .wardrobe
+                },
+                onSelect: { option in
+                    switch option {
+                    case .planOccasion:
+                        selectedTab = .home
+                    case .travelCapsule:
+                        selectedTab = .travel
+                    case .addClothes:
+                        break
+                    }
                 }
-            }
+            )
         }
         .tabViewStyle(.automatic)
         .tint(.buttonPrimary)
         .modifier(TabBarToolbarBackgroundCompat())
-    }
-}
-
-private struct TabBarToolbarBackgroundCompat: ViewModifier {
-    func body(content: Content) -> some View {
-        if #available(iOS 16.0, *) {
-            content
-                .toolbarBackground(.visible, for: .tabBar)
-                .toolbarBackground(Color(.systemBackground), for: .tabBar)
-        } else {
-            content
-        }
     }
 }

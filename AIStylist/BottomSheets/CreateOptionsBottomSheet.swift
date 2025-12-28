@@ -10,19 +10,13 @@ import UIKit
 
 struct CreateOptionsBottomSheet: View {
     @Binding var isPresented: Bool
+    let onAddClothes: () -> Void
     let onSelect: (CreateOption) -> Void
 
     @State private var dragOffset: CGFloat = 0
-    @State private var showCreateOutfit: Bool = false
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            NavigationLink(
-                destination: CreateOutfitView().hideTabBarOnPush(),
-                isActive: $showCreateOutfit,
-                label: { EmptyView() }
-            )
-            .hidden()
 
             Color.black.opacity(isPresented ? 0.28 : 0)
                 .ignoresSafeArea()
@@ -64,7 +58,7 @@ struct CreateOptionsBottomSheet: View {
                     CreateOptionRow(option: option) {
                         if option == .addClothes {
                             dismiss()
-                            showCreateOutfit = true
+                            onAddClothes()
                         } else {
                             onSelect(option)
                             dismiss()
