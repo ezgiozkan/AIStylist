@@ -16,7 +16,7 @@ struct UploadClothingResponse: Decodable {
     enum CodingKeys: String, CodingKey {
         case id
         case status
-        case imageUrl = "image_url"
+        case imageUrl
         case analysis
     }
 
@@ -34,7 +34,7 @@ struct UploadClothingResponse: Decodable {
             case season
             case formality
             case description
-            case imageUrl = "image_url"
+            case imageUrl
         }
     }
 }

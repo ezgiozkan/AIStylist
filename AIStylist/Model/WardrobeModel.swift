@@ -7,63 +7,60 @@
 
 import SwiftUI
 
-struct WardrobeItem: Identifiable {
-    let id: UUID
-    let title: String
-    let category: WardrobeCategory
-    var isFavorite: Bool
-    let imageName: String
+struct WardrobeItem: Identifiable, Decodable {
+    let id: String
+    let categoryRaw: String
+    let color: String
+    let imageUrl: String
+    let season: String
+    let formality: String
+    let itemDescription: String
 
-    var image: UIImage {
-        UIImage(named: imageName) ?? UIImage()
+    var title: String {
+        if !categoryRaw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return categoryRaw
+        }
+        return "Item"
     }
 
-    init(
-        id: UUID = UUID(),
-        title: String,
-        category: WardrobeCategory,
-        isFavorite: Bool = false,
-        imageName: String
-    ) {
-        self.id = id
-        self.title = title
-        self.category = category
-        self.isFavorite = isFavorite
-        self.imageName = imageName
+    var remoteURL: URL? {
+        let trimmed = imageUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+        return URL(string: trimmed)
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case categoryRaw = "category"
+        case color
+        case imageUrl = "image_url"
+        case season
+        case formality
+        case itemDescription = "description"
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = (try? c.decode(String.self, forKey: .id)) ?? UUID().uuidString
+        categoryRaw = (try? c.decode(String.self, forKey: .categoryRaw)) ?? ""
+        color = (try? c.decode(String.self, forKey: .color)) ?? ""
+        imageUrl = (try? c.decode(String.self, forKey: .imageUrl)) ?? ""
+        season = (try? c.decode(String.self, forKey: .season)) ?? ""
+        formality = (try? c.decode(String.self, forKey: .formality)) ?? ""
+        itemDescription = (try? c.decode(String.self, forKey: .itemDescription)) ?? ""
     }
 }
 
 extension WardrobeItem {
-   var imageSymbol: String {
-       switch imageName {
-       case "jeans": return "figure.walk"
-       case "shirt": return "shirt.fill"
-       case "boot": return "boot"
-       case "scarf": return "scissors"
-       default: return "tshirt"
-       }
-   }
+    var imageSymbol: String { "photo" }
 }
 
 struct CanvasItem: Identifiable {
     let id: UUID
-    let image: UIImage
+    var image: UIImage
 
     var offset: CGSize = .zero
     var scale: CGFloat = 1
     var rotation: Angle = .zero
     var zIndex: Double = 0
-}
-
-// MARK: - Demo Data
-
-extension WardrobeItem {
-    static let demo: [WardrobeItem] = [
-        .init(title: "Classic Trench", category: .outerwear, imageName: "tshirt"),
-        .init(title: "Slim Fit Jeans", category: .bottoms, isFavorite: true, imageName: "jeans"),
-        .init(title: "White Linen Shirt", category: .tops, imageName: "shirt"),
-        .init(title: "Leather Boots", category: .shoes, isFavorite: true, imageName: "boot"),
-        .init(title: "Silk Scarf", category: .tops, imageName: "scarf"),
-        .init(title: "Basic Tee", category: .tops, imageName: "tshirt")
-    ]
 }

@@ -132,6 +132,7 @@ struct HomeView: View {
             }
             .onAppear {
                 viewModel.load()
+                print("ACCESS TOKEN:", authVM.accessToken ?? "nil")
             }
         }
         .navigationViewStyle(StackNavigationViewStyle())

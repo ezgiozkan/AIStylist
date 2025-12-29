@@ -90,8 +90,41 @@ struct AnalyzeView: View {
         .navigationBarBackButtonHidden(true)
         .interactiveDismissDisabled(true)
         .background(DisablePopGesture())
+        .fullScreenCover(isPresented: $viewModel.isShowingSuccess) {
+            if let resp = viewModel.response {
+                AnalyzeSuccessView(
+                    response: resp,
+                    onViewWardrobe: {
+                        viewModel.isShowingSuccess = false
+                        dismiss()
+                    },
+                    onDone: {
+                        viewModel.isShowingSuccess = false
+                        dismiss()
+                    }
+                )
+            } else {
+                ProgressView()
+            }
+        }
+        .fullScreenCover(
+            isPresented: Binding(
+                get: { viewModel.step == .failed },
+                set: { _ in }
+            )
+        ) {
+            AnalyzeFailView(
+                onRetry: {
+                    if let image = viewModel.lastSelectedImage {
+                        viewModel.start(image: image)
+                    }
+                },
+                onClose: {
+                    dismiss()
+                }
+            )
+        }
     }
-
 
     private var imageCard: some View {
         ZStack(alignment: .bottom) {

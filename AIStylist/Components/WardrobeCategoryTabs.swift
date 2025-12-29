@@ -8,23 +8,23 @@
 import SwiftUI
 
 struct WardrobeCategoryTabs: View {
-    @Binding var selected: WardrobeCategory
-    let categories: [WardrobeCategory]
+    @Binding var selectedId: String
+    let categories: [WardrobeCategoryTab]
 
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
                 ForEach(categories) { category in
                     Button {
-                        selected = category
+                        selectedId = category.id
                     } label: {
                         Text(category.title)
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(selected == category ? .white : .primary)
+                            .foregroundStyle(selectedId == category.id ? .white : .primary)
                             .padding(.horizontal, WardrobeLayout.pillHorizontalPadding)
                             .frame(height: WardrobeLayout.pillHeight)
                             .background(
-                                Capsule().fill(selected == category ? Color.buttonPrimary : Color.white)
+                                Capsule().fill(selectedId == category.id ? Color.buttonPrimary : Color.white)
                             )
                             .overlay(
                                 Capsule().stroke(Color.black.opacity(0.06), lineWidth: 1)

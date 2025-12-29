@@ -9,19 +9,8 @@
 import SwiftUI
 
 struct WardrobePickerView: View {
-    @State private var selectedCategory: WardrobeCategory = .all
-    @State private var items: [WardrobeItem] = WardrobeItem.demo
-    @State private var selectedIDs: Set<UUID> = []
+    @StateObject private var viewModel = WardrobePickerViewModel()
     @State private var isCanvasPresented = false
-
-    private var filteredItems: [WardrobeItem] {
-        guard selectedCategory != .all else { return items }
-        return items.filter { $0.category == selectedCategory }
-    }
-
-    private var selectedItems: [WardrobeItem] {
-        items.filter { selectedIDs.contains($0.id) }
-    }
 
     var body: some View {
         ZStack {
@@ -30,23 +19,42 @@ struct WardrobePickerView: View {
 
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
-                    WardrobeCategoryTabs(selected: $selectedCategory,
-                                        categories: WardrobeCategory.allCases)
+                    WardrobeCategoryTabs(
+                        selectedId: $viewModel.selectedCategoryId,
+                        categories: viewModel.availableCategories
+                    )
 
-                    LazyVGrid(columns: WardrobeLayout.columns,
-                              alignment: .center,
-                              spacing: WardrobeLayout.gridSpacing) {
-                        ForEach(filteredItems) { item in
-                            WardrobeItemCard(
-                                item: item,
-                                isSelected: selectedIDs.contains(item.id),
-                                isSelectionEnabled: true,
-                                onToggleFavorite: nil,
-                                onTap: { toggleSelection(for: item.id) }
-                            )
+                    if viewModel.isLoading {
+                        WardrobePickerSkeletonGrid()
+                            .padding(.top, 4)
+                    } else if let msg = viewModel.errorMessage {
+                        EmptyStateView(
+                            title: "Couldn’t load wardrobe",
+                            subtitle: msg
+                        )
+                        .padding(.top, 12)
+                    } else if viewModel.filteredItems.isEmpty {
+                        EmptyStateView(
+                            title: "No items yet",
+                            subtitle: "Add your first clothing item to start building your wardrobe."
+                        )
+                        .padding(.top, 12)
+                    } else {
+                        LazyVGrid(columns: WardrobeLayout.columns,
+                                  alignment: .center,
+                                  spacing: WardrobeLayout.gridSpacing) {
+                            ForEach(viewModel.filteredItems) { item in
+                                WardrobeItemCard(
+                                    item: item,
+                                    isSelected: viewModel.selectedIDs.contains(item.id),
+                                    isSelectionEnabled: true,
+                                    onToggleFavorite: nil,
+                                    onTap: { viewModel.toggleSelection(for: item.id) }
+                                )
+                            }
                         }
+                        .padding(.top, 4)
                     }
-                    .padding(.top, 4)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 0)
@@ -57,23 +65,37 @@ struct WardrobePickerView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
-                Text("\(selectedIDs.count)")
+                Text("\(viewModel.selectedIDs.count)")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(Color.buttonPrimary)
 
                 Button("Next") {
                     isCanvasPresented = true
                 }
-                .disabled(selectedIDs.isEmpty)
+                .disabled(viewModel.selectedIDs.isEmpty)
             }
         }
         .fullScreenCover(isPresented: $isCanvasPresented) {
-            OutfitCanvasView(items: selectedItems)
+            OutfitCanvasView(items: viewModel.selectedItems)
+        }
+        .task {
+            await viewModel.fetchWardrobe()
         }
     }
+}
 
-    private func toggleSelection(for id: UUID) {
-        if selectedIDs.contains(id) { selectedIDs.remove(id) }
-        else { selectedIDs.insert(id) }
+private struct WardrobePickerSkeletonGrid: View {
+    var body: some View {
+        LazyVGrid(
+            columns: WardrobeLayout.columns,
+            alignment: .center,
+            spacing: WardrobeLayout.gridSpacing
+        ) {
+            ForEach(0..<8, id: \.self) { _ in
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color.black.opacity(0.06))
+                    .frame(height: 180)
+            }
+        }
     }
 }

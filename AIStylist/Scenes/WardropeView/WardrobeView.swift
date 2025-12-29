@@ -27,11 +27,20 @@ struct WardrobeView: View {
                         header
 
                         WardrobeCategoryTabs(
-                            selected: $viewModel.selectedCategory,
-                            categories: WardrobeCategory.allCases
+                            selectedId: $viewModel.selectedCategoryId,
+                            categories: viewModel.availableCategories
                         )
 
-                        if viewModel.filteredItems.isEmpty {
+                        if viewModel.isLoading {
+                            WardrobeSkeletonGrid()
+                                .padding(.top, 4)
+                        } else if let msg = viewModel.errorMessage {
+                            EmptyStateView(
+                                title: "Couldn’t load wardrobe",
+                                subtitle: msg
+                            )
+                            .padding(.top, 12)
+                        } else if viewModel.filteredItems.isEmpty {
                             EmptyStateView(
                                 title: "No items yet",
                                 subtitle: "Add your first clothing item to start building your wardrobe."
@@ -67,6 +76,9 @@ struct WardrobeView: View {
                 .padding(.bottom, 15)
             }
         }
+        .onAppear {
+            Task { await viewModel.fetchWardrobe() }
+        }
         .navigationViewStyle(StackNavigationViewStyle())
     }
 
@@ -77,6 +89,22 @@ struct WardrobeView: View {
                 .foregroundStyle(.primary)
 
             Spacer(minLength: 0)
+        }
+    }
+
+    private struct WardrobeSkeletonGrid: View {
+        var body: some View {
+            LazyVGrid(
+                columns: WardrobeLayout.columns,
+                alignment: .center,
+                spacing: WardrobeLayout.gridSpacing
+            ) {
+                ForEach(0..<8, id: \.self) { _ in
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.black.opacity(0.06))
+                        .frame(height: 180)
+                }
+            }
         }
     }
 

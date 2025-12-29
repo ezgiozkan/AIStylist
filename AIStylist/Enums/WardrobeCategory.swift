@@ -7,16 +7,21 @@
 
 import SwiftUI
 
-enum WardrobeCategory: String, CaseIterable, Identifiable {
-    case all = "All"
-    case tops = "Tops"
-    case bottoms = "Bottoms"
-    case dresses = "Dresses"
-    case outerwear = "Outerwear"
-    case shoes = "Shoes"
-    
-    var id: String { rawValue }
-    var title: String { rawValue }
+struct WardrobeCategoryTab: Identifiable, Hashable {
+    let id: String
+    let title: String
+
+    static let all = WardrobeCategoryTab(id: "all", title: "All")
+}
+
+extension String {
+    var wardrobeCategoryKey: String {
+        trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    }
+
+    var wardrobeCategoryTitle: String {
+        trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }
 
 enum WardrobeLayout {

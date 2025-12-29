@@ -13,7 +13,9 @@ final class AnalyzeViewModel: ObservableObject {
     @Published var step: Step = .imageUploaded
     @Published var isScanning = true
     @Published var response: UploadClothingResponse?
+    @Published var isShowingSuccess = false
     @Published var errorMessage: String?
+    @Published var lastSelectedImage: UIImage?
 
     private let service: ClothingUploadServicing
     private enum Constants {
@@ -29,12 +31,14 @@ final class AnalyzeViewModel: ObservableObject {
     }
 
     func start(image: UIImage) {
+        lastSelectedImage = image
         Task { await upload(image: image) }
     }
 
     func upload(image: UIImage) async {
         errorMessage = nil
         response = nil
+        isShowingSuccess = false
         step = .imageUploaded
         isScanning = true
 
@@ -49,11 +53,14 @@ final class AnalyzeViewModel: ObservableObject {
 
         do {
             let decoded = try await service.uploadClothing(pngData: pngData, accessToken: accessToken)
+            response = decoded
+
             step = .generatingLookbook
             try? await Task.sleep(nanoseconds: Constants.stepAdvanceDelayNanos)
-            response = decoded
+
             step = .completed
             isScanning = false
+            isShowingSuccess = true
         } catch {
             errorMessage = error.localizedDescription
             step = .failed

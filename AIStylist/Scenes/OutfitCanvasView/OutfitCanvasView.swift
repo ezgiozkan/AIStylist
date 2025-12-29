@@ -50,14 +50,15 @@ struct OutfitCanvasView: View {
         .onAppear {
             canvasItems = items.enumerated().map { idx, w in
                 CanvasItem(
-                    id: w.id,
-                    image: w.image,
+                    id: UUID(uuidString: w.id) ?? UUID(),
+                    image: UIImage(),
                     offset: CGSize(width: (idx % 2 == 0 ? -60 : 60), height: CGFloat(idx) * 20),
                     scale: 1,
                     rotation: .zero,
                     zIndex: Double(idx)
                 )
             }
+            Task { await loadCanvasImages() }
         }
         .ignoresSafeArea(edges: .bottom)
     }
@@ -111,6 +112,29 @@ struct OutfitCanvasView: View {
         .padding(.bottom, 12)
     }
 
+    private func loadCanvasImages() async {
+        for (idx, w) in items.enumerated() {
+            guard idx < canvasItems.count, let url = w.remoteURL else { continue }
+            if let image = await fetchImage(url: url) {
+                await MainActor.run {
+                    if idx < canvasItems.count {
+                        canvasItems[idx].image = image
+                    }
+                }
+            }
+        }
+    }
+
+    private func fetchImage(url: URL) async -> UIImage? {
+        do {
+            let (data, resp) = try await URLSession.shared.data(from: url)
+            guard let http = resp as? HTTPURLResponse, (200...299).contains(http.statusCode) else { return nil }
+            return UIImage(data: data)
+        } catch {
+            return nil
+        }
+    }
+
     private func binding(for id: UUID) -> Binding<CanvasItem> {
         guard let idx = canvasItems.firstIndex(where: { $0.id == id }) else {
             return .constant(CanvasItem(id: id, image: UIImage()))
@@ -130,4 +154,3 @@ struct OutfitCanvasView: View {
         if activeId == id { activeId = nil }
     }
 }
-

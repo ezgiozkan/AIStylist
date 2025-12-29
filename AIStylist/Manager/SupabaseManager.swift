@@ -16,8 +16,8 @@ final class SupabaseManager {
 
     private init() {
         client = SupabaseClient(
-            supabaseURL: URL(string: "https://jkmgdprztpmtobrwiswe.supabase.co")!,
-            supabaseKey: "sb_publishable_CAJNw3Y9UpCom8AgxV1ggw_wgyLrOzZ"
+            supabaseURL: URL(string: "https://smvnnqwdhwseiqrmwxxc.supabase.co")!,
+            supabaseKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNtdm5ucXdkaHdzZWlxcm13eHhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM1ODQ5MjQsImV4cCI6MjA3OTE2MDkyNH0._wEIZ4IJc04zTO4CORheQnBYTyLhyylmEoH0mW2wwY8"
         )
     }
 }

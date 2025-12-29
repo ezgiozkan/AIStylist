@@ -1,19 +1,22 @@
 //
-//  WardropeViewModel.swift
+//  WardrobePickerViewModel.swift
 //  AIStylist
 //
-//  Created by Ezgi Özkan on 28.12.2025.
+//  Created by Ezgi Özkan on 29.12.2025.
 //
 
-import SwiftUI
+import Foundation
 
-final class WardrobeViewModel: ObservableObject {
-
+@MainActor
+final class WardrobePickerViewModel: ObservableObject {
     @Published var selectedCategoryId: String = WardrobeCategoryTab.all.id
     @Published var items: [WardrobeItem] = []
-    @Published var showCreateOutfit: Bool = false
+    @Published var selectedIDs: Set<String> = []
+
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+
+    private let service = WardropeService()
 
     var filteredItems: [WardrobeItem] {
         if selectedCategoryId == WardrobeCategoryTab.all.id { return items }
@@ -36,34 +39,32 @@ final class WardrobeViewModel: ObservableObject {
         return tabs
     }
 
-    func toggleFavorite(for id: String) {
-        guard let index = items.firstIndex(where: { $0.id == id }) else { return }
-       // items[index].isFavorite.toggle()
+    var selectedItems: [WardrobeItem] {
+        items.filter { selectedIDs.contains($0.id) }
     }
 
-    private let service = WardropeService()
+    func toggleSelection(for id: String) {
+        if selectedIDs.contains(id) { selectedIDs.remove(id) }
+        else { selectedIDs.insert(id) }
+    }
 
     func fetchWardrobe() async {
         isLoading = true
         errorMessage = nil
 
         do {
-            guard let token = AuthTokenProvider.token else {
+            guard let token = AuthTokenProvider.token, !token.isEmpty else {
                 throw URLError(.userAuthenticationRequired)
             }
 
             let request = try WardropeEndpoint.wardrobe.urlRequest(bearerToken: token)
             let fetched: [WardrobeItem] = try await service.send(request)
 
-            await MainActor.run {
-                self.items = fetched
-                self.isLoading = false
-            }
+            items = fetched
+            isLoading = false
         } catch {
-            await MainActor.run {
-                self.isLoading = false
-                self.errorMessage = error.localizedDescription
-            }
+            isLoading = false
+            errorMessage = error.localizedDescription
         }
     }
 }

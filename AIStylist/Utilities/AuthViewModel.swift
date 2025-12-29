@@ -21,6 +21,7 @@ final class AuthViewModel: ObservableObject {
     func signInWithGoogle() async {
         lastAuthErrorMessage = nil
         accessToken = nil
+        AuthTokenProvider.token = nil
         do {
             let redirectTo = URL(string: "aistyle://login-callback")!
 
@@ -45,6 +46,7 @@ final class AuthViewModel: ObservableObject {
                         let authSession = try await SupabaseManager.shared.client.auth.session(from: callbackURL)
                         self.signedInUser = AuthUser(from: authSession)
                         self.accessToken = authSession.accessToken
+                        AuthTokenProvider.token = authSession.accessToken
 
                     } catch {
                         print("session(from:) error:", error)
@@ -68,6 +70,7 @@ final class AuthViewModel: ObservableObject {
         if let session = SupabaseManager.shared.client.auth.currentSession {
             signedInUser = AuthUser(from: session)
             accessToken = session.accessToken
+            AuthTokenProvider.token = session.accessToken
         }
 
         do {
@@ -84,6 +87,7 @@ final class AuthViewModel: ObservableObject {
                 accessToken: token,
                 refreshToken: refresh
             )
+            AuthTokenProvider.token = token
         } catch {}
     }
 }
