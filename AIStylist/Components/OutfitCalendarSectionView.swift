@@ -6,15 +6,16 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct OutfitCalendarSectionView: View {
     struct DayItem: Identifiable {
         enum State {
-            case planned(imageName: String)
+            case planned(imagePath: String)
             case empty
         }
 
-        let id = UUID()
+        let id: String
         let title: String
         let subtitle: String
         let weatherSymbol: String
@@ -77,42 +78,51 @@ struct OutfitCalendarSectionView: View {
     }
 
     private func dayTile(_ item: DayItem) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .center, spacing: 8) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(item.title)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.black)
-                    Text(item.subtitle)
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundStyle(.gray.opacity(0.9))
-                }
-
-                Spacer()
-
-                Image(systemName: item.weatherSymbol)
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(.gray.opacity(0.8))
-
-                Text(item.tempText)
-                    .font(.system(size: 14, weight: .semibold))
+        VStack(alignment: .center, spacing: 10) {
+            VStack(alignment: .center, spacing: 4) {
+                Text(item.title)
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.black)
+
+                Text(item.subtitle)
+                    .font(.system(size: 13, weight: .regular))
+                    .foregroundStyle(.gray.opacity(0.85))
+
+                HStack(spacing: 6) {
+                    Image(systemName: item.weatherSymbol)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(.gray.opacity(0.75))
+
+                    Text(item.tempText)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(.black)
+                }
             }
+            .frame(maxWidth: .infinity)
 
             ZStack {
-                RoundedRectangle(cornerRadius: Constants.tileRadius, style: .continuous)
-                    .fill(Color.white)
-
                 switch item.state {
-                case .planned(let imageName):
-                    ZStack(alignment: .bottomTrailing) {
-                        Image(imageName)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: Constants.tileSize.width, height: Constants.tileSize.height)
-                            .clipped()
-                            .clipShape(RoundedRectangle(cornerRadius: Constants.tileRadius, style: .continuous))
+                case .planned(let imagePath):
+                    Group {
+                        if let uiImage = UIImage(contentsOfFile: imagePath) {
+                            let displayImage = uiImage.aiTrimmedAlpha() ?? uiImage
+                            Image(uiImage: displayImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: Constants.tileSize.width, height: Constants.tileSize.height)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: Constants.tileRadius, style: .continuous))
+                                .clipped()
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: Constants.tileRadius, style: .continuous)
+                                        .stroke(Color.black.opacity(0.12), lineWidth: 1)
+                                )
+                        } else {
+                            RoundedRectangle(cornerRadius: Constants.tileRadius, style: .continuous)
+                                .fill(Color.black.opacity(0.06))
+                        }
                     }
+                    .contentShape(RoundedRectangle(cornerRadius: Constants.tileRadius, style: .continuous))
                     .onTapGesture { onTapDay(item) }
 
                 case .empty:
@@ -141,7 +151,7 @@ struct OutfitCalendarSectionView: View {
                 }
             }
             .frame(width: Constants.tileSize.width, height: Constants.tileSize.height)
-            .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 10)
+            .shadow(color: Color.black.opacity(0.04), radius: 10, x: 0, y: 8)
         }
         .frame(width: Constants.tileSize.width)
     }

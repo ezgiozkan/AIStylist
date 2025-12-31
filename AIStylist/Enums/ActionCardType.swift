@@ -32,9 +32,9 @@ enum ActionCardType {
     var icon: String {
         switch self {
         case .occasion:
-            return "calendar"
+            return "icon_plan"
         case .travel:
-            return "suitcase"
+            return "icon_travel"
         }
     }
 

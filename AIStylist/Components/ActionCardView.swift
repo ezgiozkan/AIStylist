@@ -16,28 +16,30 @@ struct ActionCardView: View {
             VStack(spacing: 12) {
                 ZStack {
                     Circle()
-                        .fill(type.accentColor.opacity(0.12))
+                        .fill(Color.buttonPrimary.opacity(0.12))
                         .frame(width: 48, height: 48)
 
-                    Image(systemName: type.icon)
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(type.accentColor)
+                    Image(type.icon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 22, height: 22)
+                        .foregroundStyle(Color.buttonPrimary)
                 }
 
                 Text(type.title)
                     .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(.primary)
 
                 Text(type.subtitle)
                     .font(.system(size: 14))
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(Color.black.opacity(0.7))
             }
             .frame(maxWidth: .infinity, minHeight: 160)
             .background(
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
                     .fill(Color.white)
             )
-            .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
+            .shadow(color: Color.black.opacity(0.08), radius: 16, x: 0, y: 10)
         }
         .buttonStyle(.plain)
     }

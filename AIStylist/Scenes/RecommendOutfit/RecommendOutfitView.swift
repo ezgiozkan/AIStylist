@@ -45,18 +45,11 @@ struct RecommendOutfitView: View {
                 .font(.system(size: 18, weight: .regular))
                 .foregroundColor(Colors.purple)
 
-            HStack(spacing: 0) {
-                Text("Powered by Style AI ✨")
-                    .font(.system(size: 15, weight: .medium))
-                    .foregroundColor(Colors.primaryText)
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 10)
-            .background(
-                Capsule(style: .continuous)
-                    .fill(Colors.pillBackground)
-            )
-            .padding(.top, 4)
+            Text("Outfit suggestions are built from the items you’ve added to your wardrobe. The more you add, the smarter and more personalized Style AI recommendations become.")
+                .font(.system(size: 15, weight: .regular))
+                .foregroundColor(Colors.secondaryText)
+                .lineSpacing(3)
+                .padding(.top, 2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }

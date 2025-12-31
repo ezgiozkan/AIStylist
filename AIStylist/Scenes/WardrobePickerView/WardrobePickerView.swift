@@ -9,8 +9,12 @@
 import SwiftUI
 
 struct WardrobePickerView: View {
+    let planDayKey: String
+
     @StateObject private var viewModel = WardrobePickerViewModel()
     @State private var isCanvasPresented = false
+    @State private var didFetchWardrobe = false
+    @SwiftUI.Environment(\.dismiss) private var dismiss
 
     var body: some View {
         ZStack {
@@ -76,9 +80,14 @@ struct WardrobePickerView: View {
             }
         }
         .fullScreenCover(isPresented: $isCanvasPresented) {
-            OutfitCanvasView(items: viewModel.selectedItems)
+            OutfitCanvasView(items: viewModel.selectedItems, dayKey: planDayKey)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .outfitCanvasDidSave)) { _ in
+            dismiss()
         }
         .task {
+            guard didFetchWardrobe == false else { return }
+            didFetchWardrobe = true
             await viewModel.fetchWardrobe()
         }
     }

@@ -193,7 +193,7 @@ struct TravelView: View {
             .frame(height: 56)
             .foregroundStyle(Color.white)
             .background(accentColor)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
             .shadow(color: accentColor.opacity(0.25), radius: 18, x: 0, y: 10)
         }
         .buttonStyle(.plain)

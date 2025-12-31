@@ -25,21 +25,23 @@ struct CanvasSticker: View {
         Image(uiImage: item.image)
             .resizable()
             .scaledToFit()
-            .frame(width: 170, height: 170)
             .padding(12)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 18))
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(Color.clear)
+            )
             .overlay(
-                RoundedRectangle(cornerRadius: 18)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(isActive ? Color.black.opacity(0.18) : .clear, lineWidth: 1)
             )
+            .frame(width: 170, height: 170)
             .overlay(alignment: .topTrailing) {
                 if isActive {
                     Button(action: onDelete) {
                         Image(systemName: "xmark.circle.fill")
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundStyle(.black.opacity(0.75))
-                            .background(Color.white.clipShape(Circle()))
+                            .background(Color.clear.clipShape(Circle()))
                     }
                     .offset(x: 8, y: -8)
                 }
