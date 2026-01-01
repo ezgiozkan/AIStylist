@@ -30,8 +30,8 @@ struct OutfitResultView: View {
 
                         HStack(spacing: 8) {
                             if let first = response.selectedItems.first {
-                                chip(text: first.season)
-                                chip(text: first.formality)
+                                chip(text: first.season ?? "")
+                                chip(text: first.formality ?? "")
                             }
                         }
 
@@ -84,7 +84,7 @@ struct OutfitResultView: View {
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.primary)
 
-                                    Text(item.description)
+                                    Text(item.description ?? "")
                                         .font(.system(size: 13, weight: .regular))
                                         .foregroundColor(.secondary)
                                         .lineLimit(1)

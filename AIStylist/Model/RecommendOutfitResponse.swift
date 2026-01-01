@@ -18,9 +18,9 @@ struct RecommendOutfitResponse: Decodable {
         let category: String
         let color: String
         let imageURL: String
-        let season: String
-        let formality: String
-        let description: String
+        let season: String?
+        let formality: String?
+        let description: String?
 
         enum CodingKeys: String, CodingKey {
             case id
