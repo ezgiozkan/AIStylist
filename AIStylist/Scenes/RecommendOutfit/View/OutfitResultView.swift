@@ -30,8 +30,8 @@ struct OutfitResultView: View {
 
                         HStack(spacing: 8) {
                             if let first = response.selectedItems.first {
-                                chip(text: first.season ?? "")
-                                chip(text: first.formality ?? "")
+                                chip(text: first.category)
+                                chip(text: first.color)
                             }
                         }
 
@@ -84,7 +84,7 @@ struct OutfitResultView: View {
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.primary)
 
-                                    Text(item.description ?? "")
+                                    Text((item.description?.isEmpty == false) ? (item.description ?? "") : item.color)
                                         .font(.system(size: 13, weight: .regular))
                                         .foregroundColor(.secondary)
                                         .lineLimit(1)
@@ -96,9 +96,6 @@ struct OutfitResultView: View {
                                     .fill(Color.black.opacity(0.18))
                                     .frame(width: 10, height: 10)
 
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.secondary.opacity(0.7))
                             }
                             .padding(.horizontal, 14)
                             .padding(.vertical, 12)
@@ -138,7 +135,7 @@ struct OutfitResultView: View {
             .background(RecommendOutfitView.Colors.screenBackground.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: onClose) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(Color.buttonPrimary)

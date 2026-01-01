@@ -43,7 +43,7 @@ struct TravelCapsuleResultView: View {
             .background(Color.black.opacity(0.03).ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: onClose) {
                         Image(systemName: "chevron.left")
                             .foregroundColor(accent)
@@ -193,10 +193,6 @@ struct TravelCapsuleResultView: View {
             }
 
             Spacer(minLength: 0)
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundColor(.secondary.opacity(0.7))
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
