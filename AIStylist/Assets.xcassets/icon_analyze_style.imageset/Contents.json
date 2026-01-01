@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "icon_analyze_style.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

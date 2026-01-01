@@ -29,4 +29,12 @@ enum Weather: String, CaseIterable, Identifiable {
         case .mixed: return "cloud.sun"
         }
     }
+
+    var apiValue: String {
+        switch self {
+        case .cold: return "cold"
+        case .warm: return "warm"
+        case .mixed: return "mixed"
+        }
+    }
 }

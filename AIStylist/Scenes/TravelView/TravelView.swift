@@ -11,6 +11,7 @@ struct TravelView: View {
 
     private let accentColor: Color = HomeViewConstants.buttonPrimaryColor
     @StateObject private var viewModel = TravelViewModel()
+    @State private var isShowingResult: Bool = false
 
     var body: some View {
         ZStack {
@@ -38,6 +39,34 @@ struct TravelView: View {
             }
         }
         .preferredColorScheme(.light)
+        .fullScreenCover(
+            isPresented: Binding(
+                get: { viewModel.isGenerating },
+                set: { _ in }
+            )
+        ) {
+            AnalyzeStyleLoadingOverlay()
+                .ignoresSafeArea()
+                .interactiveDismissDisabled(true)
+        }
+        .onReceive(viewModel.$generatedTravelPack) { newValue in
+            isShowingResult = (newValue != nil)
+        }
+        .fullScreenCover(isPresented: $isShowingResult) {
+            if let response = viewModel.generatedTravelPack {
+                TravelCapsuleResultView(
+                    destination: viewModel.destinationDisplayText,
+                    days: viewModel.tripLength,
+                    weatherTitle: viewModel.selectedWeather.title,
+                    response: response,
+                    onClose: {
+                        isShowingResult = false
+                    }
+                )
+            } else {
+                Color.clear
+            }
+        }
         .sheet(isPresented: $viewModel.isCountrySheetPresented) {
             DestinationPickerSheet(
                 query: viewModel.destinationQuery,
@@ -196,7 +225,27 @@ struct TravelView: View {
             .clipShape(RoundedRectangle(cornerRadius: 34, style: .continuous))
             .shadow(color: accentColor.opacity(0.25), radius: 18, x: 0, y: 10)
         }
+        .disabled(viewModel.isGenerating || !viewModel.hasSelectedDestination)
+        .opacity((viewModel.isGenerating || !viewModel.hasSelectedDestination) ? 0.55 : 1)
         .buttonStyle(.plain)
+    }
+}
+
+extension View {
+    func aiStylistTravelCapsuleResultView(
+        destination: String,
+        days: Int,
+        weatherTitle: String,
+        response: RecommendTravelPackResponseDTO,
+        onClose: @escaping () -> Void
+    ) -> some View {
+        TravelCapsuleResultView(
+            destination: destination,
+            days: days,
+            weatherTitle: weatherTitle,
+            response: response,
+            onClose: onClose
+        )
     }
 }
 

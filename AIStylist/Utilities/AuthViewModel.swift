@@ -90,6 +90,19 @@ final class AuthViewModel: ObservableObject {
             AuthTokenProvider.token = token
         } catch {}
     }
+    
+    func signOut() async {
+        do {
+            try await SupabaseManager.shared.client.auth.signOut()
+        } catch {
+            print("Sign out error:", error)
+        }
+
+        signedInUser = nil
+        accessToken = nil
+        lastAuthErrorMessage = nil
+        AuthTokenProvider.token = nil
+    }
 }
 
 final class WebAuthPresentationContextProvider: NSObject, ASWebAuthenticationPresentationContextProviding {
@@ -97,7 +110,8 @@ final class WebAuthPresentationContextProvider: NSObject, ASWebAuthenticationPre
     func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
         UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }
-            .flatMap { $0.windows }
+            .map { $0.windows }
+            .flatMap { $0 }
             .first { $0.isKeyWindow } ?? ASPresentationAnchor()
     }
 }

@@ -91,9 +91,9 @@ struct AnalyzeView: View {
         .interactiveDismissDisabled(true)
         .background(DisablePopGesture())
         .fullScreenCover(isPresented: $viewModel.isShowingSuccess) {
-            if let resp = viewModel.response {
+            if let item = viewModel.wardrobeItem {
                 AnalyzeSuccessView(
-                    response: resp,
+                    wardrobeItem: item,
                     onViewWardrobe: {
                         viewModel.isShowingSuccess = false
                         dismiss()

@@ -8,13 +8,12 @@
 import SwiftUI
 
 struct AnalyzeSuccessView: View {
-    let response: UploadClothingResponse
+    let wardrobeItem: WardrobeItemResponse
     var onViewWardrobe: (() -> Void)? = nil
     var onDone: (() -> Void)? = nil
 
     private var rawImageUrl: String {
-        let s = (response.analysis?.imageUrl ?? response.imageUrl ?? "")
-        return s.trimmingCharacters(in: .whitespacesAndNewlines)
+        wardrobeItem.imageURL.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     var body: some View {
@@ -97,25 +96,25 @@ struct AnalyzeSuccessView: View {
                         HStack(spacing: 12) {
                             chip(
                                 title: "CATEGORY",
-                                value: response.analysis?.category ?? "",
-                                icon: categoryIcon(response.analysis?.category)
+                                value: wardrobeItem.category,
+                                icon: categoryIcon(wardrobeItem.category)
                             )
                             chip(
                                 title: "COLOR",
-                                value: response.analysis?.color ?? "",
-                                icon: colorIcon(response.analysis?.color)
+                                value: wardrobeItem.color,
+                                icon: colorIcon(wardrobeItem.color)
                             )
                         }
                         HStack(spacing: 12) {
                             chip(
                                 title: "SEASON",
-                                value: response.analysis?.season ?? "",
-                                icon: seasonIcon(response.analysis?.season)
+                                value: wardrobeItem.season,
+                                icon: seasonIcon(wardrobeItem.season)
                             )
                             chip(
                                 title: "FORMALITY",
-                                value: response.analysis?.formality ?? "",
-                                icon: formalityIcon(response.analysis?.formality)
+                                value: wardrobeItem.formality,
+                                icon: formalityIcon(wardrobeItem.formality)
                             )
                         }
                     }
@@ -128,7 +127,7 @@ struct AnalyzeSuccessView: View {
                                 Text("AI Description")
                                     .font(.system(size: 16, weight: .semibold))
                             }
-                            Text(response.analysis?.description ?? "")
+                            Text(wardrobeItem.description)
                                 .font(.system(size: 14))
                                 .foregroundStyle(.secondary)
                                 .lineSpacing(4)
@@ -141,43 +140,10 @@ struct AnalyzeSuccessView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 20)
             }
-
-            VStack(spacing: 12) {
-                Button {
-                    onViewWardrobe?()
-                } label: {
-                    HStack {
-                        Text("View Wardrobe")
-                            .font(.system(size: 17, weight: .semibold))
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 16, weight: .semibold))
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 16)
-                }
-                .background(Color.purple)
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-
-                Button {
-                    onDone?()
-                } label: {
-                    Text("Done")
-                        .font(.system(size: 16, weight: .semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .foregroundStyle(.secondary)
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 12)
-            .padding(.bottom, 18)
-            .background(.ultraThinMaterial)
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .onAppear {
-            print("ROOT imageUrl 👉", response.imageUrl as Any)
-            print("ANALYSIS imageUrl 👉", response.analysis?.imageUrl as Any)
+            print("WARDROBE image_url 👉", wardrobeItem.imageURL)
             print("RAW (used) imageUrl 👉", rawImageUrl)
         }
     }

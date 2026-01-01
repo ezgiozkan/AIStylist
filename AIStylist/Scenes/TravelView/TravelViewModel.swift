@@ -15,6 +15,9 @@ final class TravelViewModel: NSObject, ObservableObject {
     @Published var tripLength: Int = 5
     @Published var selectedWeather: Weather = .warm
 
+    @Published private(set) var isGenerating: Bool = false
+    @Published private(set) var generatedTravelPack: RecommendTravelPackResponseDTO? = nil
+
     var canDecrementTripLength: Bool { tripLength > 1 }
 
     var destinationDisplayText: String {
@@ -24,6 +27,8 @@ final class TravelViewModel: NSObject, ObservableObject {
     var hasSelectedDestination: Bool {
         selectedCountryName != nil
     }
+
+    private let travelPackService: TravelPackServicing
 
     func decrementTripLength() {
         guard tripLength > 1 else { return }
@@ -35,7 +40,45 @@ final class TravelViewModel: NSObject, ObservableObject {
     }
 
     func generateTapped() {
-        // backend will be connected later
+        generateTapped(token: "")
+    }
+
+    func generateTapped(token: String) {
+        let resolvedToken = AuthTokenProvider.token ?? token
+        print("🚀 Travel generateTapped")
+        print("Resolved token empty:", resolvedToken.isEmpty)
+        let destinationToSend = destination.trimmingCharacters(in: .whitespacesAndNewlines)
+        print("Destination (raw):", destination)
+        print("Destination (trimmed):", destinationToSend)
+        guard !destinationToSend.isEmpty else { return }
+        print("Trip length (days):", tripLength)
+        print("Weather:", selectedWeather.apiValue)
+
+        isGenerating = true
+        generatedTravelPack = nil
+
+        let days = tripLength
+        let weatherParam = selectedWeather.apiValue
+
+        Task { @MainActor in
+            defer { self.isGenerating = false }
+
+            do {
+                print("➡️ TravelPack REQUEST")
+                let result = try await self.travelPackService.recommendTravelPack(
+                    token: resolvedToken,
+                    destination: destinationToSend,
+                    days: days,
+                    weather: weatherParam
+                )
+                print("⬅️ TravelPack SUCCESS")
+                print("Response:", result)
+                self.generatedTravelPack = result
+            } catch {
+                print("❌ TravelPack FAILED")
+                print(error.localizedDescription)
+            }
+        }
     }
 
     @Published var destinationQuery: String = ""
@@ -48,6 +91,13 @@ final class TravelViewModel: NSObject, ObservableObject {
     }()
 
     override init() {
+        self.travelPackService = TravelPackService()
+        super.init()
+        completer.delegate = self
+    }
+
+    init(travelPackService: TravelPackServicing) {
+        self.travelPackService = travelPackService
         super.init()
         completer.delegate = self
     }
@@ -81,6 +131,7 @@ final class TravelViewModel: NSObject, ObservableObject {
 
 extension TravelViewModel: MKLocalSearchCompleterDelegate {
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        print("📍 Destination suggestions updated:", completer.results.count)
         destinationSuggestions = completer.results
             .map { [$0.title, $0.subtitle].filter { !$0.isEmpty }.joined(separator: ", ") }
             .filter { !$0.isEmpty }

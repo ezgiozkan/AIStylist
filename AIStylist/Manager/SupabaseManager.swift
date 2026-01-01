@@ -5,7 +5,6 @@
 //  Created by Ezgi Özkan on 28.12.2025.
 //
 
-
 import Supabase
 import Foundation
 

@@ -14,6 +14,7 @@ struct ProfileView: View {
 
     // MARK: - UI State
     @State private var isLoading = false
+    @State private var isLogoutAlertPresented = false
 
     var body: some View {
         ScrollView {
@@ -30,6 +31,14 @@ struct ProfileView: View {
         .onAppear { viewModel.bind(user: authVM.signedInUser) }
         .onChange(of: authVM.signedInUser?.id) { _ in
             viewModel.bind(user: authVM.signedInUser)
+        }
+        .alert("Log Out?", isPresented: $isLogoutAlertPresented) {
+            Button("Cancel", role: .cancel) { }
+            Button("Log Out", role: .destructive) {
+                Task { await authVM.signOut() }
+            }
+        } message: {
+            Text("You will need to sign in again to access your wardrobe and recommendations.")
         }
     }
 
@@ -183,7 +192,7 @@ struct ProfileView: View {
                 title: "Log Out",
                 isDestructive: true
             ) {
-                // TODO: logout
+                isLogoutAlertPresented = true
             }
         }
         .background(

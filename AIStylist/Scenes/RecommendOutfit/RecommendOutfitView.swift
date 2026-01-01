@@ -10,28 +10,47 @@ import SwiftUI
 struct RecommendOutfitView: View {
 
     @StateObject private var viewModel = RecommendOutfitViewModel()
+    @State private var isShowingResult = false
 
     var body: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(alignment: .leading, spacing: 18) {
+        ZStack {
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 18) {
 
-                header
+                    header
 
-                Text("Choose an occasion")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(Colors.primaryText)
-                    .padding(.top, 6)
+                    Text("Choose an occasion")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(Colors.primaryText)
+                        .padding(.top, 6)
 
-                occasionGrid
-                    .padding(.top, 2)
+                    occasionGrid
+                        .padding(.top, 2)
+                }
+                .padding(.horizontal, Layout.horizontalPadding)
+                .padding(.top, Layout.topPadding)
+                .padding(.bottom, Layout.scrollBottomPadding)
             }
-            .padding(.horizontal, Layout.horizontalPadding)
-            .padding(.top, Layout.topPadding)
-            .padding(.bottom, Layout.scrollBottomPadding)
+            .background(Colors.screenBackground.ignoresSafeArea())
+            .safeAreaInset(edge: .bottom) {
+                bottomBar
+            }
+            .onReceive(viewModel.$generatedOutfit) { newValue in
+                isShowingResult = (newValue != nil)
+            }
+
+            if viewModel.isGenerating {
+                AnalyzeStyleLoadingOverlay()
+            }
         }
-        .background(Colors.screenBackground.ignoresSafeArea())
-        .safeAreaInset(edge: .bottom) {
-            bottomBar
+        .fullScreenCover(isPresented: $isShowingResult) {
+            if let response = viewModel.generatedOutfit {
+                OutfitResultView(response: response) {
+                    isShowingResult = false
+                }
+            } else {
+                Color.clear
+            }
         }
     }
 
@@ -70,7 +89,8 @@ struct RecommendOutfitView: View {
     private var bottomBar: some View {
         VStack(spacing: 10) {
             Button {
-                viewModel.generateTapped()
+                print("🟣 Generate button tapped")
+                viewModel.generateTapped(token: "", weather: "cold")
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "sparkles")
@@ -88,8 +108,8 @@ struct RecommendOutfitView: View {
                 .shadow(color: Colors.primaryButtonShadow, radius: 24, x: 0, y: 10)
             }
             .buttonStyle(.plain)
-            .disabled(viewModel.selectedOccasionID == nil)
-            .opacity(viewModel.selectedOccasionID == nil ? 0.55 : 1)
+            .disabled(viewModel.selectedOccasionID == nil || viewModel.isGenerating)
+            .opacity((viewModel.selectedOccasionID == nil || viewModel.isGenerating) ? 0.55 : 1)
 
             Text("You’ll get 2–3 outfit options.")
                 .font(.system(size: 13, weight: .regular))
@@ -113,62 +133,7 @@ struct RecommendOutfitView: View {
     }
 }
 
-private struct OccasionCard: View {
-    let item: OccasionItem
-    let isSelected: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            ZStack(alignment: .topTrailing) {
-
-                RoundedRectangle(cornerRadius: RecommendOutfitView.Layout.cardCornerRadius, style: .continuous)
-                    .fill(Color.white)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: RecommendOutfitView.Layout.cardCornerRadius, style: .continuous)
-                            .stroke(isSelected ? RecommendOutfitView.Colors.purple : Color.clear, lineWidth: 1.5)
-                    )
-                    .shadow(color: RecommendOutfitView.Colors.cardShadow, radius: 18, x: 0, y: 10)
-
-                if isSelected {
-                    ZStack {
-                        Circle().fill(RecommendOutfitView.Colors.purple)
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 10, weight: .bold))
-                            .foregroundColor(.white)
-                    }
-                    .frame(width: 22, height: 22)
-                    .padding(12)
-                }
-
-                VStack(spacing: 14) {
-                    ZStack {
-                        Circle()
-                            .fill(RecommendOutfitView.Colors.iconBackground)
-                        Image(systemName: item.systemIconName)
-                            .font(.system(size: 22, weight: .semibold))
-                            .foregroundColor(RecommendOutfitView.Colors.purple)
-                    }
-                    .frame(width: 54, height: 54)
-
-                    Text(item.title)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(isSelected ? RecommendOutfitView.Colors.purple : RecommendOutfitView.Colors.primaryText)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.9)
-                        .padding(.horizontal, 10)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.vertical, 18)
-            }
-            .frame(height: RecommendOutfitView.Layout.cardHeight)
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-private extension RecommendOutfitView {
+extension RecommendOutfitView {
     enum Layout {
         static let horizontalPadding: CGFloat = 20
         static let topPadding: CGFloat = 18
@@ -202,6 +167,15 @@ private extension RecommendOutfitView {
         static let primaryButtonShadow = Color(red: 0.52, green: 0.33, blue: 0.94).opacity(0.30)
 
         static let cardShadow = Color.black.opacity(0.06)
+    }
+}
+
+extension View {
+    func aiStylistOutfitResultView(
+        response: RecommendOutfitResponse,
+        onClose: @escaping () -> Void
+    ) -> some View {
+        OutfitResultView(response: response, onClose: onClose)
     }
 }
 
