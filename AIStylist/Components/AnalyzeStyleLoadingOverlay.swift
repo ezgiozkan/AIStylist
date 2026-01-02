@@ -33,7 +33,7 @@ struct AnalyzeStyleLoadingOverlay: View {
                     .font(.system(size: 16, weight: .medium))
                     .foregroundColor(.white)
                     .opacity(0.9)
-                    .padding(.top, 90)
+                    .padding(.top, 140)
 
                 Spacer()
             }

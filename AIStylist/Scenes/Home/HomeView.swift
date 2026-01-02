@@ -70,7 +70,7 @@ struct HomeView: View {
                             } else {
                                 Color.clear
                                     .aiStylistTodayPickCard(
-                                        imageName: "icon_work",
+                                        imageName: "",
                                         remoteImageURL: viewModel.todayPickImageURL,
                                         pillText: "TODAY’S PICK",
                                         title: viewModel.todayPickTitle,

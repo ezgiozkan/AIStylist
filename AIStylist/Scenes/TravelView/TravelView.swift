@@ -37,8 +37,14 @@ struct TravelView: View {
                         .padding(.top, 10)
                         .padding(.bottom, 18)
                 }
-                .allowsHitTesting(premium.isPremium)
                 .padding(.horizontal, 20)
+            }
+            if premium.isPremium == false {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        showPremiumPaywall = true
+                    }
             }
         }
         .preferredColorScheme(.light)
