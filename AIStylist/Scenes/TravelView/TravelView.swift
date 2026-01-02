@@ -11,7 +11,9 @@ struct TravelView: View {
 
     private let accentColor: Color = HomeViewConstants.buttonPrimaryColor
     @StateObject private var viewModel = TravelViewModel()
+    @EnvironmentObject private var premium: PremiumManager
     @State private var isShowingResult: Bool = false
+    @State private var showPremiumPaywall: Bool = false
 
     var body: some View {
         ZStack {
@@ -35,6 +37,7 @@ struct TravelView: View {
                         .padding(.top, 10)
                         .padding(.bottom, 18)
                 }
+                .allowsHitTesting(premium.isPremium)
                 .padding(.horizontal, 20)
             }
         }
@@ -50,6 +53,10 @@ struct TravelView: View {
                 .interactiveDismissDisabled(true)
         }
         .onReceive(viewModel.$generatedTravelPack) { newValue in
+            guard premium.isPremium else {
+                isShowingResult = false
+                return
+            }
             isShowingResult = (newValue != nil)
         }
         .fullScreenCover(isPresented: $isShowingResult) {
@@ -75,6 +82,21 @@ struct TravelView: View {
                 onSelect: { viewModel.selectDestination($0) },
                 accentColor: accentColor
             )
+        }
+        .onAppear {
+            if premium.isPremium == false {
+                showPremiumPaywall = true
+            }
+        }
+        .onChange(of: premium.isPremium) { isPremium in
+            if isPremium {
+                showPremiumPaywall = false
+            }
+        }
+        .fullScreenCover(isPresented: $showPremiumPaywall) {
+            PremiumPaywallView(isPresented: $showPremiumPaywall)
+                .environmentObject(premium)
+                .interactiveDismissDisabled(true)
         }
     }
 
@@ -209,6 +231,10 @@ struct TravelView: View {
 
     private var generateButton: some View {
         Button {
+            guard premium.isPremium else {
+                showPremiumPaywall = true
+                return
+            }
             viewModel.generateTapped()
         } label: {
             HStack(spacing: 10) {
@@ -357,6 +383,7 @@ private struct DestinationPickerSheet: View {
 struct TravelView_Previews: PreviewProvider {
     static var previews: some View {
         TravelView()
+            .environmentObject(PremiumManager())
     }
 }
 #endif

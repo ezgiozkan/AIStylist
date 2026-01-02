@@ -9,8 +9,14 @@ import SwiftUI
 
 struct RecommendOutfitView: View {
 
+    @EnvironmentObject private var premium: PremiumManager
+
     @StateObject private var viewModel = RecommendOutfitViewModel()
     @State private var isShowingResult = false
+
+    @State private var showPremiumPaywall = false
+
+    @AppStorage("free_outfit_generations_left") private var freeGenerationsLeft: Int = 2
 
     var body: some View {
         ZStack {
@@ -36,6 +42,10 @@ struct RecommendOutfitView: View {
                 bottomBar
             }
             .onReceive(viewModel.$generatedOutfit) { newValue in
+                guard premium.isPremium || freeGenerationsLeft >= 0 else {
+                    isShowingResult = false
+                    return
+                }
                 isShowingResult = (newValue != nil)
             }
 
@@ -51,6 +61,11 @@ struct RecommendOutfitView: View {
             } else {
                 Color.clear
             }
+        }
+        .fullScreenCover(isPresented: $showPremiumPaywall) {
+            PremiumPaywallView(isPresented: $showPremiumPaywall)
+                .environmentObject(premium)
+                .interactiveDismissDisabled(true)
         }
     }
 
@@ -89,8 +104,20 @@ struct RecommendOutfitView: View {
     private var bottomBar: some View {
         VStack(spacing: 10) {
             Button {
-                print("🟣 Generate button tapped")
-                viewModel.generateTapped(token: "", weather: "cold")
+                guard viewModel.isGenerating == false else { return }
+
+                if premium.isPremium {
+                    viewModel.generateTapped(token: "", weather: "cold")
+                    return
+                }
+
+                if freeGenerationsLeft > 0 {
+                    freeGenerationsLeft -= 1
+                    viewModel.generateTapped(token: "", weather: "cold")
+                    return
+                }
+
+                showPremiumPaywall = true
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "sparkles")
@@ -181,4 +208,5 @@ extension View {
 
 #Preview {
     RecommendOutfitView()
+        .environmentObject(PremiumManager())
 }

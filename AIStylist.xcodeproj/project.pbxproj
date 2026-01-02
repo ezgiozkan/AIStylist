@@ -14,6 +14,7 @@
 		6636927E2F06FCDE0081AAF7 /* AdaptyPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 6636927D2F06FCDE0081AAF7 /* AdaptyPlugin */; };
 		663692802F06FCDE0081AAF7 /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6636927F2F06FCDE0081AAF7 /* AdaptyUI */; };
 		663692822F06FCDE0081AAF7 /* AdaptyUIBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 663692812F06FCDE0081AAF7 /* AdaptyUIBuilder */; };
+		663692922F082B830081AAF7 /* AIStylist.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 663692912F082B830081AAF7 /* AIStylist.storekit */; };
 		66E403DE2EF8A8D0004BA1E9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 66E403DD2EF8A8D0004BA1E9 /* Alamofire */; };
 		66E71BF92F01706F0005E942 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71BF82F01706F0005E942 /* Auth */; };
 		66E71BFB2F01706F0005E942 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71BFA2F01706F0005E942 /* Functions */; };
@@ -44,6 +45,7 @@
 		660CCA122EBBC3B500E8650A /* AIStylist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIStylist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		660CCA1F2EBBC3B700E8650A /* AIStylistTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIStylistTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		660CCA292EBBC3B700E8650A /* AIStylistUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIStylistUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		663692912F082B830081AAF7 /* AIStylist.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = AIStylist.storekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -119,6 +121,7 @@
 		660CCA092EBBC3B500E8650A = {
 			isa = PBXGroup;
 			children = (
+				663692912F082B830081AAF7 /* AIStylist.storekit */,
 				660CCA142EBBC3B500E8650A /* AIStylist */,
 				660CCA222EBBC3B700E8650A /* AIStylistTests */,
 				660CCA2C2EBBC3B700E8650A /* AIStylistUITests */,
@@ -283,6 +286,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				663692922F082B830081AAF7 /* AIStylist.storekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,7 +472,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 6U8Z5D3W4M;
+				DEVELOPMENT_TEAM = YJ43G2NR3P;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIStylist/Info.plist;
@@ -502,7 +506,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 6U8Z5D3W4M;
+				DEVELOPMENT_TEAM = YJ43G2NR3P;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIStylist/Info.plist;

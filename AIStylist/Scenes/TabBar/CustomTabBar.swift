@@ -79,9 +79,10 @@ struct TabBarView: View {
                 if newValue == .create {
                     showCreateOptionsSheet = true
                     selectedTab = lastNonCreateTab
-                } else {
-                    lastNonCreateTab = newValue
+                    return
                 }
+
+                lastNonCreateTab = newValue
             }
 
             CreateOptionsBottomSheet(

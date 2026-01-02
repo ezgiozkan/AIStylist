@@ -25,6 +25,18 @@ struct AnalyzeStyleLoadingOverlay: View {
 
             Color.black.opacity(0.25)
                 .ignoresSafeArea()
+
+            VStack {
+                Spacer()
+
+                Text("Matching items from your wardrobe...")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(.white)
+                    .opacity(0.9)
+                    .padding(.top, 90)
+
+                Spacer()
+            }
         }
         .onAppear {
             isAnimating = true

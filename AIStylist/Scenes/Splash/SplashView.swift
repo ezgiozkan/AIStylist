@@ -65,14 +65,6 @@ struct SplashView: View {
                                 .background(Color.black)
                                 .clipShape(Capsule())
                             }
-
-                            if let msg = authVM.lastAuthErrorMessage {
-                                Text(msg)
-                                    .font(.system(size: 12, weight: .regular))
-                                    .foregroundColor(.white.opacity(0.85))
-                                    .multilineTextAlignment(.center)
-                                    .padding(.top, 8)
-                            }
                         }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
                     } else {
@@ -125,7 +117,7 @@ struct SplashView: View {
                     }
                 }
                 .padding(.horizontal, 24)
-                .padding(.bottom, 50)
+                .padding(.bottom, 90)
             }
         }
         .onAppear {

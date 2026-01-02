@@ -10,39 +10,71 @@ import SwiftUI
 struct ProfileView: View {
 
     @EnvironmentObject var authVM: AuthViewModel
+    @EnvironmentObject var premium: PremiumManager
     @StateObject private var viewModel = ProfileViewModel()
-
-    // MARK: - UI State
     @State private var isLoading = false
     @State private var isLogoutAlertPresented = false
+    @State private var route: Route? = nil
+    @State private var showPremiumPaywall = false
 
-    var body: some View {
-        ScrollView {
-            VStack(spacing: Layout.sectionSpacing) {
-                header
-                planCard
-                menuCard
-            }
-            .padding(.horizontal, Layout.horizontalPadding)
-            .padding(.top, Layout.topPadding)
-            .padding(.bottom, Layout.bottomPadding)
-        }
-        .background(Colors.screenBackground.ignoresSafeArea())
-        .onAppear { viewModel.bind(user: authVM.signedInUser) }
-        .onChange(of: authVM.signedInUser?.id) { _ in
-            viewModel.bind(user: authVM.signedInUser)
-        }
-        .alert("Log Out?", isPresented: $isLogoutAlertPresented) {
-            Button("Cancel", role: .cancel) { }
-            Button("Log Out", role: .destructive) {
-                Task { await authVM.signOut() }
-            }
-        } message: {
-            Text("You will need to sign in again to access your wardrobe and recommendations.")
-        }
+    private enum Route: String, Hashable, Identifiable {
+        case privacy
+        case helpSupport
+
+        var id: String { rawValue }
     }
 
-    // MARK: - Header
+    var body: some View {
+        NavigationView {
+            ZStack {
+                ScrollView {
+                    VStack(spacing: Layout.sectionSpacing) {
+                        header
+                        planCard
+                        menuCard
+                    }
+                    .padding(.horizontal, Layout.horizontalPadding)
+                    .padding(.top, Layout.topPadding)
+                    .padding(.bottom, Layout.bottomPadding)
+                }
+                .background(Colors.screenBackground.ignoresSafeArea())
+                NavigationLink(
+                    destination: PrivacySecurityView()
+                        .onAppear { UITabBar.appearance().isHidden = true }
+                        .onDisappear { UITabBar.appearance().isHidden = false },
+                    tag: .privacy,
+                    selection: $route
+                ) { EmptyView() }
+                .hidden()
+
+                NavigationLink(
+                    destination: HelpSupportView()
+                        .onAppear { UITabBar.appearance().isHidden = true }
+                        .onDisappear { UITabBar.appearance().isHidden = false },
+                    tag: .helpSupport,
+                    selection: $route
+                ) { EmptyView() }
+                .hidden()
+            }
+            .onAppear { viewModel.bind(user: authVM.signedInUser) }
+            .onChange(of: authVM.signedInUser?.id) { _ in
+                viewModel.bind(user: authVM.signedInUser)
+            }
+            .alert("Log Out?", isPresented: $isLogoutAlertPresented) {
+                Button("Cancel", role: .cancel) { }
+                Button("Log Out", role: .destructive) {
+                    Task { await authVM.signOut() }
+                }
+            } message: {
+                Text("You will need to sign in again to access your wardrobe and recommendations.")
+            }
+        }
+        .fullScreenCover(isPresented: $showPremiumPaywall) {
+            PremiumPaywallView(isPresented: $showPremiumPaywall)
+                .environmentObject(premium)
+        }
+        .navigationViewStyle(.stack)
+    }
 
     private var header: some View {
         VStack(spacing: 10) {
@@ -102,11 +134,10 @@ struct ProfileView: View {
         .clipShape(Circle())
     }
 
-    // MARK: - Plan Card
-
     private var planCard: some View {
         Button {
-            // TODO: open paywall / premium
+            guard premium.isPremium == false else { return }
+            showPremiumPaywall = true
         } label: {
             HStack(spacing: 14) {
                 ZStack {
@@ -119,11 +150,11 @@ struct ProfileView: View {
                 .frame(width: 44, height: 44)
 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Free Plan")
+                    Text(premium.isPremium ? "Premium" : "Free Plan")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(Colors.primaryText)
 
-                    Text("Upgrade to unlock premium\nfeatures")
+                    Text(premium.isPremium ? "You’re subscribed to Premium" : "Upgrade to unlock premium\nfeatures")
                         .font(.system(size: 15, weight: .regular))
                         .foregroundColor(Colors.secondaryText)
                         .multilineTextAlignment(.leading)
@@ -131,9 +162,11 @@ struct ProfileView: View {
 
                 Spacer(minLength: 0)
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(Colors.chevron)
+                if premium.isPremium == false {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(Colors.chevron)
+                }
             }
             .padding(16)
             .background(
@@ -142,48 +175,11 @@ struct ProfileView: View {
             )
         }
         .buttonStyle(.plain)
+        .disabled(premium.isPremium)
     }
-
-    // MARK: - Menu Card
 
     private var menuCard: some View {
         VStack(spacing: 0) {
-
-            ProfileMenuRow(
-                iconSystemName: "lock.fill",
-                iconBackground: Colors.grayIconBackground,
-                iconForeground: Colors.grayIconForeground,
-                title: "Privacy & Security",
-                isDestructive: false
-            ) {
-                // TODO: navigate to privacy
-            }
-
-            divider
-
-            ProfileMenuRow(
-                iconSystemName: "questionmark.circle.fill",
-                iconBackground: Colors.grayIconBackground,
-                iconForeground: Colors.grayIconForeground,
-                title: "Help & Support",
-                isDestructive: false
-            ) {
-                // TODO: navigate to help
-            }
-
-            divider
-
-            ProfileMenuRow(
-                iconSystemName: "message.fill",
-                iconBackground: Colors.grayIconBackground,
-                iconForeground: Colors.grayIconForeground,
-                title: "Feedback",
-                isDestructive: false
-            ) {
-                // TODO: navigate to feedback
-            }
-
-            divider
 
             ProfileMenuRow(
                 iconSystemName: "rectangle.portrait.and.arrow.right.fill",
@@ -209,8 +205,6 @@ struct ProfileView: View {
             .padding(.leading, Layout.dividerLeading)
     }
 }
-
-// MARK: - Row
 
 private struct ProfileMenuRow: View {
     let iconSystemName: String
@@ -248,9 +242,7 @@ private struct ProfileMenuRow: View {
     }
 }
 
-// MARK: - Layout + Colors
-
-private extension ProfileView {
+extension ProfileView {
     enum Layout {
         static let horizontalPadding: CGFloat = 20
         static let topPadding: CGFloat = 26
@@ -284,8 +276,4 @@ private extension ProfileView {
 
         static let avatarBackground = Color(red: 0.92, green: 0.90, blue: 0.98)
     }
-}
-
-#Preview {
-    ProfileView()
 }
