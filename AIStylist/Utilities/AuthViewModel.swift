@@ -7,6 +7,7 @@
 
 import AuthenticationServices
 import Supabase
+import Adapty
 import UIKit
 
 @MainActor
@@ -48,6 +49,8 @@ final class AuthViewModel: ObservableObject {
                         self.accessToken = authSession.accessToken
                         AuthTokenProvider.token = authSession.accessToken
 
+                        await self.syncAdaptyIdentity(userId: authSession.user.id.uuidString)
+
                     } catch {
                         print("session(from:) error:", error)
                     }
@@ -71,6 +74,8 @@ final class AuthViewModel: ObservableObject {
             signedInUser = AuthUser(from: session)
             accessToken = session.accessToken
             AuthTokenProvider.token = session.accessToken
+
+            await syncAdaptyIdentity(userId: session.user.id.uuidString)
         }
 
         do {
@@ -88,7 +93,21 @@ final class AuthViewModel: ObservableObject {
                 refreshToken: refresh
             )
             AuthTokenProvider.token = token
+
+            await syncAdaptyIdentity(userId: freshUser.id.uuidString)
         } catch {}
+    }
+    
+    private func syncAdaptyIdentity(userId: String?) async {
+        do {
+            if let userId {
+                try await Adapty.identify(userId)
+            } else {
+                try await Adapty.logout()
+            }
+        } catch {
+            print("Adapty identity sync error:", error)
+        }
     }
     
     func signOut() async {
@@ -97,6 +116,8 @@ final class AuthViewModel: ObservableObject {
         } catch {
             print("Sign out error:", error)
         }
+
+        await syncAdaptyIdentity(userId: nil)
 
         signedInUser = nil
         accessToken = nil
