@@ -14,6 +14,10 @@ struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
     @State private var isLoading = false
     @State private var isLogoutAlertPresented = false
+    @State private var isDeleteAccountAlertPresented = false
+    @State private var isDeleteAccountErrorPresented = false
+    @State private var deleteAccountErrorMessage: String = ""
+    @State private var isDeletingAccount = false
     @State private var route: Route? = nil
     @State private var showPremiumPaywall = false
 
@@ -67,6 +71,28 @@ struct ProfileView: View {
                 }
             } message: {
                 Text("You will need to sign in again to access your wardrobe and recommendations.")
+            }
+            .alert("Delete Account?", isPresented: $isDeleteAccountAlertPresented) {
+                Button("Cancel", role: .cancel) { }
+                Button("Delete", role: .destructive) {
+                    isDeletingAccount = true
+                    Task {
+                        do {
+                            try await authVM.deleteAccount()
+                        } catch {
+                            deleteAccountErrorMessage = error.localizedDescription
+                            isDeleteAccountErrorPresented = true
+                        }
+                        isDeletingAccount = false
+                    }
+                }
+            } message: {
+                Text("This permanently deletes your account and all associated data. This action cannot be undone.")
+            }
+            .alert("Couldn’t Delete Account", isPresented: $isDeleteAccountErrorPresented) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(deleteAccountErrorMessage)
             }
         }
         .fullScreenCover(isPresented: $showPremiumPaywall) {
@@ -182,6 +208,19 @@ struct ProfileView: View {
         VStack(spacing: 0) {
 
             ProfileMenuRow(
+                iconSystemName: "trash.fill",
+                iconBackground: Colors.redTint,
+                iconForeground: Colors.red,
+                title: "Delete Account",
+                isDestructive: true
+            ) {
+                isDeleteAccountAlertPresented = true
+            }
+            .disabled(isDeletingAccount)
+
+            divider
+
+            ProfileMenuRow(
                 iconSystemName: "rectangle.portrait.and.arrow.right.fill",
                 iconBackground: Colors.redTint,
                 iconForeground: Colors.red,
@@ -190,6 +229,7 @@ struct ProfileView: View {
             ) {
                 isLogoutAlertPresented = true
             }
+            .disabled(isDeletingAccount)
         }
         .background(
             RoundedRectangle(cornerRadius: Layout.cardCornerRadius, style: .continuous)
@@ -231,9 +271,11 @@ private struct ProfileMenuRow: View {
 
                 Spacer(minLength: 0)
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(ProfileView.Colors.chevron)
+                if isDestructive == false {
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(ProfileView.Colors.chevron)
+                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 14)

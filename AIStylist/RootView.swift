@@ -6,9 +6,10 @@
 //
 
 import SwiftUI
+import RevenueCatUI
 
 struct RootView: View {
-    @StateObject private var authVM = AuthViewModel()
+    @EnvironmentObject private var authVM: AuthViewModel
     @State private var didCheckInitialSession = false
 
     var body: some View {
@@ -17,10 +18,17 @@ struct RootView: View {
                 Color.clear
             } else if authVM.signedInUser != nil {
                 TabBarView()
-                    .environmentObject(authVM)
+                    .presentPaywallIfNeeded(
+                        requiredEntitlementIdentifier: "premium",
+                        purchaseCompleted: { customerInfo in
+                            print("Purchase completed: \(customerInfo.entitlements)")
+                        },
+                        restoreCompleted: { customerInfo in
+                            print("Purchases restored: \(customerInfo.entitlements)")
+                        }
+                    )
             } else {
                 SplashView()
-                    .environmentObject(authVM)
             }
         }
         .onAppear {

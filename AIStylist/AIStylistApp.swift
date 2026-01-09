@@ -6,23 +6,27 @@
 //
 
 import SwiftUI
-import Adapty
-import AdaptyUI
+import RevenueCat
 
 @main
 struct AIStylistApp: App {
     @StateObject private var premium = PremiumManager()
+    @StateObject private var auth = AuthViewModel()
 
     init() {
-        Adapty.activate("public_live_tIDhVRbe.6HBRifMTYi0TMKjUpk3N")
-        AdaptyUI.activate()
+        Purchases.logLevel = .debug
+        Purchases.configure(withAPIKey: "test_ObkcNDlMneyeiLCnYKDkaiKCGgg")
     }
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(premium)
+                .environmentObject(auth)
                 .preferredColorScheme(.light)
-                .task { premium.configure() }
+                .task {
+                    premium.configure()
+                    await auth.loadInitialUserIfAvailable()
+                }
         }
     }
 }

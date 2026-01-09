@@ -8,26 +8,42 @@
 import Foundation
 import AuthenticationServices
 
-@MainActor
 final class SplashViewModel: ObservableObject {
-    private let authVM = AuthViewModel()
+    @Published private(set) var isSigningIn: Bool = false
 
     func signInWithGoogle() async {
-           do {
-               _ = try await SupabaseManager.shared.client.auth.signInWithOAuth(
-                   provider: .google,
-                   redirectTo: URL(string: "aistyle://login-callback")!
-               ) { (session: ASWebAuthenticationSession) in
-                   session.prefersEphemeralWebBrowserSession = true
-               }
+        await MainActor.run { self.isSigningIn = true }
+        defer { Task { @MainActor in self.isSigningIn = false } }
 
-               await SupabaseManager.shared.client.auth.startAutoRefresh()
-           } catch {
-               print("Google sign in error:", error)
-           }
-       }
+        do {
+            _ = try await SupabaseManager.shared.client.auth.signInWithOAuth(
+                provider: .google,
+                redirectTo: URL(string: "aistyle://login-callback")!
+            ) { (session: ASWebAuthenticationSession) in
+                session.prefersEphemeralWebBrowserSession = true
+            }
+
+            await SupabaseManager.shared.client.auth.startAutoRefresh()
+        } catch {
+            print("Google sign in error:", error)
+        }
+    }
 
     func signInWithApple() async {
-        //TODO: signInWithApple
+        await MainActor.run { self.isSigningIn = true }
+        defer { Task { @MainActor in self.isSigningIn = false } }
+
+        do {
+            _ = try await SupabaseManager.shared.client.auth.signInWithOAuth(
+                provider: .apple,
+                redirectTo: URL(string: "aistyle://login-callback")!
+            ) { (session: ASWebAuthenticationSession) in
+                session.prefersEphemeralWebBrowserSession = true
+            }
+
+            await SupabaseManager.shared.client.auth.startAutoRefresh()
+        } catch {
+            print("Apple sign in error:", error)
+        }
     }
 }

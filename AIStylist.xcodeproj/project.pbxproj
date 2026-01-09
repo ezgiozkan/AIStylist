@@ -7,14 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		663692762F06FCDD0081AAF7 /* Adapty in Frameworks */ = {isa = PBXBuildFile; productRef = 663692752F06FCDD0081AAF7 /* Adapty */; };
-		663692782F06FCDE0081AAF7 /* Adapty_KidsMode in Frameworks */ = {isa = PBXBuildFile; productRef = 663692772F06FCDE0081AAF7 /* Adapty_KidsMode */; };
-		6636927A2F06FCDE0081AAF7 /* AdaptyDeveloperTools in Frameworks */ = {isa = PBXBuildFile; productRef = 663692792F06FCDE0081AAF7 /* AdaptyDeveloperTools */; };
-		6636927C2F06FCDE0081AAF7 /* AdaptyLogger in Frameworks */ = {isa = PBXBuildFile; productRef = 6636927B2F06FCDE0081AAF7 /* AdaptyLogger */; };
-		6636927E2F06FCDE0081AAF7 /* AdaptyPlugin in Frameworks */ = {isa = PBXBuildFile; productRef = 6636927D2F06FCDE0081AAF7 /* AdaptyPlugin */; };
-		663692802F06FCDE0081AAF7 /* AdaptyUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6636927F2F06FCDE0081AAF7 /* AdaptyUI */; };
-		663692822F06FCDE0081AAF7 /* AdaptyUIBuilder in Frameworks */ = {isa = PBXBuildFile; productRef = 663692812F06FCDE0081AAF7 /* AdaptyUIBuilder */; };
 		663692922F082B830081AAF7 /* AIStylist.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 663692912F082B830081AAF7 /* AIStylist.storekit */; };
+		66CFD8312F110F0E00466BD0 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 66CFD8302F110F0E00466BD0 /* RevenueCat */; };
+		66CFD8332F110F1300466BD0 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 66CFD8322F110F1300466BD0 /* RevenueCatUI */; };
 		66E403DE2EF8A8D0004BA1E9 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 66E403DD2EF8A8D0004BA1E9 /* Alamofire */; };
 		66E71BF92F01706F0005E942 /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71BF82F01706F0005E942 /* Auth */; };
 		66E71BFB2F01706F0005E942 /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = 66E71BFA2F01706F0005E942 /* Functions */; };
@@ -84,17 +79,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6636927A2F06FCDE0081AAF7 /* AdaptyDeveloperTools in Frameworks */,
-				663692822F06FCDE0081AAF7 /* AdaptyUIBuilder in Frameworks */,
-				663692802F06FCDE0081AAF7 /* AdaptyUI in Frameworks */,
 				66E71C032F01706F0005E942 /* Supabase in Frameworks */,
-				6636927E2F06FCDE0081AAF7 /* AdaptyPlugin in Frameworks */,
-				6636927C2F06FCDE0081AAF7 /* AdaptyLogger in Frameworks */,
-				663692782F06FCDE0081AAF7 /* Adapty_KidsMode in Frameworks */,
-				663692762F06FCDD0081AAF7 /* Adapty in Frameworks */,
 				66E71C012F01706F0005E942 /* Storage in Frameworks */,
 				66E71BFD2F01706F0005E942 /* PostgREST in Frameworks */,
 				66E71BFB2F01706F0005E942 /* Functions in Frameworks */,
+				66CFD8312F110F0E00466BD0 /* RevenueCat in Frameworks */,
+				66CFD8332F110F1300466BD0 /* RevenueCatUI in Frameworks */,
 				66E71BF92F01706F0005E942 /* Auth in Frameworks */,
 				66E71BFF2F01706F0005E942 /* Realtime in Frameworks */,
 				66E403DE2EF8A8D0004BA1E9 /* Alamofire in Frameworks */,
@@ -174,13 +164,8 @@
 				66E71BFE2F01706F0005E942 /* Realtime */,
 				66E71C002F01706F0005E942 /* Storage */,
 				66E71C022F01706F0005E942 /* Supabase */,
-				663692752F06FCDD0081AAF7 /* Adapty */,
-				663692772F06FCDE0081AAF7 /* Adapty_KidsMode */,
-				663692792F06FCDE0081AAF7 /* AdaptyDeveloperTools */,
-				6636927B2F06FCDE0081AAF7 /* AdaptyLogger */,
-				6636927D2F06FCDE0081AAF7 /* AdaptyPlugin */,
-				6636927F2F06FCDE0081AAF7 /* AdaptyUI */,
-				663692812F06FCDE0081AAF7 /* AdaptyUIBuilder */,
+				66CFD8302F110F0E00466BD0 /* RevenueCat */,
+				66CFD8322F110F1300466BD0 /* RevenueCatUI */,
 			);
 			productName = AIStylist;
 			productReference = 660CCA122EBBC3B500E8650A /* AIStylist.app */;
@@ -267,7 +252,7 @@
 			packageReferences = (
 				66E403DB2EF8A860004BA1E9 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				66E71BF72F01705E0005E942 /* XCRemoteSwiftPackageReference "supabase-swift" */,
-				663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */,
+				66CFD82F2F110F0000466BD0 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 660CCA132EBBC3B500E8650A /* Products */;
@@ -470,12 +455,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AIStylist/AIStylist.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = YJ43G2NR3P;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIStylist/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Outfit Planner: AI Stylist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access so you can take a photo to analyze your outfit.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location to show local weather and outfit suggestions.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need access to save photos if you choose to export or save results.";
@@ -493,9 +487,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = AIStylist.AIStylist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -504,12 +502,21 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AIStylist/AIStylist.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = YJ43G2NR3P;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_CAMERA = YES;
+				ENABLE_RESOURCE_ACCESS_LOCATION = YES;
+				ENABLE_RESOURCE_ACCESS_PHOTO_LIBRARY = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AIStylist/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Outfit Planner: AI Stylist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				INFOPLIST_KEY_NSCameraUsageDescription = "We need camera access so you can take a photo to analyze your outfit.";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We use your location to show local weather and outfit suggestions.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "We need access to save photos if you choose to export or save results.";
@@ -527,9 +534,13 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = AIStylist.AIStylist;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -647,12 +658,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */ = {
+		66CFD82F2F110F0000466BD0 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/adaptyteam/AdaptySDK-iOS.git";
+			repositoryURL = "https://github.com/RevenueCat/purchases-ios";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.15.2;
+				minimumVersion = 5.53.0;
 			};
 		};
 		66E403DB2EF8A860004BA1E9 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
@@ -674,40 +685,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		663692752F06FCDD0081AAF7 /* Adapty */ = {
+		66CFD8302F110F0E00466BD0 /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */;
-			productName = Adapty;
+			package = 66CFD82F2F110F0000466BD0 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCat;
 		};
-		663692772F06FCDE0081AAF7 /* Adapty_KidsMode */ = {
+		66CFD8322F110F1300466BD0 /* RevenueCatUI */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */;
-			productName = Adapty_KidsMode;
-		};
-		663692792F06FCDE0081AAF7 /* AdaptyDeveloperTools */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */;
-			productName = AdaptyDeveloperTools;
-		};
-		6636927B2F06FCDE0081AAF7 /* AdaptyLogger */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */;
-			productName = AdaptyLogger;
-		};
-		6636927D2F06FCDE0081AAF7 /* AdaptyPlugin */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */;
-			productName = AdaptyPlugin;
-		};
-		6636927F2F06FCDE0081AAF7 /* AdaptyUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */;
-			productName = AdaptyUI;
-		};
-		663692812F06FCDE0081AAF7 /* AdaptyUIBuilder */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 663692742F06FCCC0081AAF7 /* XCRemoteSwiftPackageReference "AdaptySDK-iOS" */;
-			productName = AdaptyUIBuilder;
+			package = 66CFD82F2F110F0000466BD0 /* XCRemoteSwiftPackageReference "purchases-ios" */;
+			productName = RevenueCatUI;
 		};
 		66E403DD2EF8A8D0004BA1E9 /* Alamofire */ = {
 			isa = XCSwiftPackageProductDependency;

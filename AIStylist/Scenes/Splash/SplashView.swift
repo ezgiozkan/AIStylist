@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct SplashView: View {
-    @EnvironmentObject var authVM: AuthViewModel
+    @EnvironmentObject private var authVM: AuthViewModel
     @State private var showContinueWithEmail = false
     @State private var animateExplore = false
+    @State private var isSigningIn = false
+    
     var body: some View {
         ZStack {
             Image("icon_onboarding")
@@ -25,48 +27,61 @@ struct SplashView: View {
 
                 ZStack {
                     if showContinueWithEmail {
-                        VStack(spacing: 12) {
-                            Button {
-                                Task { await authVM.signInWithGoogle() }
-                            } label: {
-                                HStack(spacing: 12) {
+                        VStack(spacing: 18) {
+                            HStack(spacing: 16) {
+                                Button {
+                                    Task {
+                                        isSigningIn = true
+                                        await authVM.signInWithGoogle()
+                                        isSigningIn = false
+                                    }
+                                } label: {
                                     Image("icon_google")
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 20, height: 20)
-
-                                    Text("Continue with Google")
-                                        .font(.system(size: 17, weight: .semibold))
-                                        .foregroundColor(.black)
+                                        .frame(width: 24, height: 24)
+                                        .frame(width: 56, height: 56)
+                                        .background(Color.white)
+                                        .clipShape(Circle())
+                                        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 4)
                                 }
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(Color.white)
-                                .clipShape(Capsule())
-                                .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 4)
+                                .disabled(isSigningIn)
+
+                                Button {
+                                    Task {
+                                        isSigningIn = true
+                                        await authVM.signInWithApple()
+                                        isSigningIn = false
+                                    }
+                                } label: {
+                                    Image(systemName: "applelogo")
+                                        .font(.system(size: 22, weight: .medium))
+                                        .foregroundColor(.white)
+                                        .frame(width: 56, height: 56)
+                                        .background(Color.black)
+                                        .clipShape(Circle())
+                                        .shadow(color: Color.black.opacity(0.12), radius: 6, x: 0, y: 4)
+                                }
+                                .disabled(isSigningIn)
                             }
 
                             Button {
                                 Task {
-                                   // await authVM.signInWithApple()
+                                    isSigningIn = true
+                                    await authVM.signInAsGuest()
+                                    isSigningIn = false
                                 }
                             } label: {
-                                HStack(spacing: 12) {
-                                    Image(systemName: "applelogo")
-                                        .font(.system(size: 18, weight: .medium))
-                                        .foregroundColor(.white)
-
-                                    Text("Continue with Apple")
-                                        .font(.system(size: 17, weight: .semibold))
-                                        .foregroundColor(.white)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 56)
-                                .background(Color.black)
-                                .clipShape(Capsule())
+                                Text("Continue as Guest")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 44)
+                                    .background(Color.black)
+                                    .clipShape(Capsule())
                             }
+                            .disabled(isSigningIn)
                         }
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
                     } else {
                         Button(action: {
                             withAnimation(.easeInOut(duration: 0.35)) {

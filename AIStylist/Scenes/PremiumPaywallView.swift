@@ -6,61 +6,21 @@
 //
 
 import SwiftUI
-import Adapty
-import AdaptyUI
+import RevenueCat
+import RevenueCatUI
 
 struct PremiumPaywallView: View {
     @EnvironmentObject var premium: PremiumManager
     @Binding var isPresented: Bool
 
-    @State private var paywallConfig: AdaptyUI.PaywallConfiguration?
-    @State private var isLoading = false
-
-    private let placementId = "main_paywall"
-
     var body: some View {
-        Group {
-            if let paywallConfig {
-                AdaptyPaywallView(
-                    paywallConfiguration: paywallConfig,
-                    didFinishPurchase: { _, _ in
-                        Task {
-                            await premium.refreshAccess()
-                            if premium.isPremium { isPresented = false }
-                        }
-                    },
-                    didFailPurchase: { _, _ in },
-                    didFinishRestore: { _ in
-                        Task {
-                            await premium.refreshAccess()
-                            if premium.isPremium { isPresented = false }
-                        }
-                    },
-                    didFailRestore: { _ in },
-                    didFailRendering: { _ in
-                        isPresented = false
-                    }
-                )
-            } else {
-                ProgressView()
-                    .task {
-                        if isLoading == false {
-                            await loadPaywallConfig()
-                        }
-                    }
+        PaywallView(displayCloseButton: true)
+            .onDisappear {
+                // Keep local state in sync with the sheet presentation.
+                isPresented = false
+
+                // Refresh entitlement state after purchase/restore/close.
+                Task { await premium.refreshAccess() }
             }
-        }
-    }
-
-    private func loadPaywallConfig() async {
-        isLoading = true
-        defer { isLoading = false }
-
-        do {
-            let paywall = try await Adapty.getPaywall(placementId: placementId)
-            paywallConfig = try await AdaptyUI.getPaywallConfiguration(forPaywall: paywall)
-        } catch {
-            paywallConfig = nil
-        }
     }
 }
