@@ -27,6 +27,7 @@ final class ClothingUploadService: ClothingUploadServicing {
         print("➡️ UploadClothing REQUEST")
         print("URL:", url.absoluteString)
         print("PNG size (bytes):", pngData.count)
+        print("Token:", accessToken ?? "nil")
         print("Token empty:", accessToken?.isEmpty ?? true)
 
         let dataResponse = await session

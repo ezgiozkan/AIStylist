@@ -16,10 +16,7 @@ struct PremiumPaywallView: View {
     var body: some View {
         PaywallView(displayCloseButton: true)
             .onDisappear {
-                // Keep local state in sync with the sheet presentation.
                 isPresented = false
-
-                // Refresh entitlement state after purchase/restore/close.
                 Task { await premium.refreshAccess() }
             }
     }

@@ -4,4 +4,10 @@
    <FileRef
       location = "self:">
    </FileRef>
+   <FileRef
+      location = "group:REVENUECAT_ENTITLEMENT_FIX.md">
+   </FileRef>
+   <FileRef
+      location = "group:Configuration.storekit">
+   </FileRef>
 </Workspace>

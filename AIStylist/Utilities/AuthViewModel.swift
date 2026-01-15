@@ -10,6 +10,7 @@ import CryptoKit
 import Security
 import Supabase
 import UIKit
+import RevenueCat
 
 @MainActor
 final class AuthViewModel: ObservableObject {
@@ -39,6 +40,17 @@ final class AuthViewModel: ObservableObject {
             signedInUser = AuthUser(from: session)
             accessToken = session.accessToken
             AuthTokenProvider.token = session.accessToken
+            
+            // RevenueCat login - Anonymous'tan transfer edilir
+            if let userId = session.user.id.uuidString as String? {
+                do {
+                    let (customerInfo, created) = try await Purchases.shared.logIn(userId)
+                    print("🍎 Apple login → RevenueCat: \(created ? "new user" : "transferred from anonymous")")
+                    print("   Entitlements: \(customerInfo.entitlements.active.keys.joined(separator: ", "))")
+                } catch {
+                    print("RevenueCat login error:", error)
+                }
+            }
         } catch {
             print("Apple sign in error:", error)
             lastAuthErrorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -80,6 +92,17 @@ final class AuthViewModel: ObservableObject {
                         self.signedInUser = AuthUser(from: authSession)
                         self.accessToken = authSession.accessToken
                         AuthTokenProvider.token = authSession.accessToken
+                        
+                        // RevenueCat login - Anonymous'tan transfer edilir
+                        if let userId = authSession.user.id.uuidString as String? {
+                            do {
+                                let (customerInfo, created) = try await Purchases.shared.logIn(userId)
+                                print("🔵 Google login → RevenueCat: \(created ? "new user" : "transferred from anonymous")")
+                                print("   Entitlements: \(customerInfo.entitlements.active.keys.joined(separator: ", "))")
+                            } catch {
+                                print("RevenueCat login error:", error)
+                            }
+                        }
                     } catch {
                         print("session(from:) error:", error)
                         self.lastAuthErrorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
@@ -113,7 +136,11 @@ final class AuthViewModel: ObservableObject {
             signedInUser = AuthUser(from: session)
             accessToken = session.accessToken
             AuthTokenProvider.token = session.accessToken
-
+            
+            // Guest için RevenueCat login YAPMAYIN!
+            // RevenueCat otomatik anonymous user oluşturur
+            // Gerçek login yapınca transfer edilir
+            print("👤 Guest login - RevenueCat will use anonymous ID")
 
         } catch {
             print("Guest sign in error:", error)
@@ -126,7 +153,20 @@ final class AuthViewModel: ObservableObject {
             signedInUser = AuthUser(from: session)
             accessToken = session.accessToken
             AuthTokenProvider.token = session.accessToken
-
+            
+            // RevenueCat login - Ama guest değilse!
+            let isAnonymous = session.user.isAnonymous
+            if !isAnonymous, let userId = session.user.id.uuidString as String? {
+                do {
+                    let (customerInfo, created) = try await Purchases.shared.logIn(userId)
+                    print("🔄 RevenueCat login: \(created ? "new user" : "existing user")")
+                    print("   Entitlements: \(customerInfo.entitlements.active.keys.joined(separator: ", "))")
+                } catch {
+                    print("RevenueCat login error:", error)
+                }
+            } else if isAnonymous {
+                print("👤 Anonymous user - RevenueCat using anonymous ID")
+            }
         }
 
         do {
@@ -144,6 +184,18 @@ final class AuthViewModel: ObservableObject {
                 refreshToken: refresh
             )
             AuthTokenProvider.token = token
+            
+            // RevenueCat login - Ama guest değilse!
+            let isAnonymous = freshUser.isAnonymous
+            if !isAnonymous, let userId = freshUser.id.uuidString as String? {
+                do {
+                    let (customerInfo, created) = try await Purchases.shared.logIn(userId)
+                    print("🔄 RevenueCat fresh login: \(created ? "new user" : "existing user")")
+                    print("   Entitlements: \(customerInfo.entitlements.active.keys.joined(separator: ", "))")
+                } catch {
+                    print("RevenueCat login error:", error)
+                }
+            }
 
         } catch {}
     }
@@ -174,6 +226,12 @@ final class AuthViewModel: ObservableObject {
             print("Sign out error:", error)
         }
 
+        // RevenueCat logout
+        do {
+            _ = try await Purchases.shared.logOut()
+        } catch {
+            print("RevenueCat logout error:", error)
+        }
 
         signedInUser = nil
         accessToken = nil

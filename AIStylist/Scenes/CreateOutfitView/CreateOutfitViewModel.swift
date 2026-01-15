@@ -43,17 +43,17 @@ final class CreateOutfitViewModel: ObservableObject {
     }
 
     func requestCameraPermissionAndPresent() {
-        isPreparingImagePicker = true
-
         guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
-            isPreparingImagePicker = false
             return
         }
 
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
+            // Eğer zaten izin varsa, direkt aç - loading gösterme
             presentImagePicker(source: .camera)
         case .notDetermined:
+            // Sadece izin isterken loading göster
+            isPreparingImagePicker = true
             AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
                 Task { @MainActor in
                     guard granted else {
@@ -64,18 +64,17 @@ final class CreateOutfitViewModel: ObservableObject {
                 }
             }
         default:
-            isPreparingImagePicker = false
+            break
         }
     }
 
     func requestPhotoLibraryPermissionAndPresent() {
-        isPreparingImagePicker = true
-
         let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
         switch status {
         case .authorized, .limited:
             presentImagePicker(source: .photoLibrary)
         case .notDetermined:
+            isPreparingImagePicker = true
             PHPhotoLibrary.requestAuthorization(for: .readWrite) { [weak self] newStatus in
                 Task { @MainActor in
                     guard newStatus == .authorized || newStatus == .limited else {
@@ -86,7 +85,7 @@ final class CreateOutfitViewModel: ObservableObject {
                 }
             }
         default:
-            isPreparingImagePicker = false
+            break
         }
     }
 

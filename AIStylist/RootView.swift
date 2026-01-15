@@ -10,6 +10,7 @@ import RevenueCatUI
 
 struct RootView: View {
     @EnvironmentObject private var authVM: AuthViewModel
+    @EnvironmentObject private var premium: PremiumManager
     @State private var didCheckInitialSession = false
 
     var body: some View {
@@ -18,15 +19,6 @@ struct RootView: View {
                 Color.clear
             } else if authVM.signedInUser != nil {
                 TabBarView()
-                    .presentPaywallIfNeeded(
-                        requiredEntitlementIdentifier: "premium",
-                        purchaseCompleted: { customerInfo in
-                            print("Purchase completed: \(customerInfo.entitlements)")
-                        },
-                        restoreCompleted: { customerInfo in
-                            print("Purchases restored: \(customerInfo.entitlements)")
-                        }
-                    )
             } else {
                 SplashView()
             }

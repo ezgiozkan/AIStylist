@@ -14,9 +14,16 @@ struct AIStylistApp: App {
     @StateObject private var auth = AuthViewModel()
 
     init() {
+        // RevenueCat Configuration
+        #if DEBUG
         Purchases.logLevel = .debug
-        Purchases.configure(withAPIKey: "test_ObkcNDlMneyeiLCnYKDkaiKCGgg")
+        Purchases.configure(withAPIKey: "appl_QaReAVCDlELAkukKuKhpIHHCBNq")
+        #else
+        Purchases.logLevel = .info
+        Purchases.configure(withAPIKey: "appl_QaReAVCDlELAkukKuKhpIHHCBNq")
+        #endif
     }
+    
     var body: some Scene {
         WindowGroup {
             RootView()

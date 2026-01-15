@@ -58,14 +58,15 @@ struct HomeView: View {
                 )
                 .hidden()
 
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 24) {
-                        headerView
+                GeometryReader { geometry in
+                    ScrollView(.vertical, showsIndicators: false) {
+                        VStack(alignment: .leading, spacing: 24) {
+                            headerView
                         weatherRow
 
                         VStack(alignment: .leading, spacing: 16) {
                             if viewModel.isTodayPickLoading {
-                                TodayPickHeroCardSkeleton(height: 380)
+                                TodayPickHeroCardSkeleton(height: 380, width: geometry.size.width - 40)
                                     .padding(.horizontal, 20)
                             } else {
                                 Color.clear
@@ -74,7 +75,8 @@ struct HomeView: View {
                                         remoteImageURL: viewModel.todayPickImageURL,
                                         pillText: "TODAY’S PICK",
                                         title: viewModel.todayPickTitle,
-                                        subtitle: viewModel.todayPickDescription
+                                        subtitle: viewModel.todayPickDescription,
+                                        width: geometry.size.width - 40
                                     )
                                     .padding(.horizontal, 20)
                             }
@@ -135,10 +137,11 @@ struct HomeView: View {
 
                         Spacer(minLength: 0)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(width: geometry.size.width, alignment: .leading)
                     .padding(.top, 12)
                     .padding(.bottom, 24)
                 }
+            }
             }
             .safeAreaInset(edge: .bottom, alignment: .trailing) {
                 FloatingCreateButton {
@@ -233,7 +236,8 @@ extension View {
         pillText: String,
         title: String,
         subtitle: String,
-        height: CGFloat = 380
+        height: CGFloat = 380,
+        width: CGFloat
     ) -> some View {
         TodayPickHeroCard(
             imageName: imageName,
@@ -241,7 +245,8 @@ extension View {
             pillText: pillText,
             title: title,
             subtitle: subtitle,
-            height: height
+            height: height,
+            width: width
         )
     }
 }
@@ -258,6 +263,8 @@ private struct LazyView<Content: View>: View {
     }
 }
 
+
+
 private struct TodayPickHeroCardSkeleton: View {
     private enum Constants {
         static let cornerRadius: CGFloat = 28
@@ -268,12 +275,13 @@ private struct TodayPickHeroCardSkeleton: View {
     }
 
     let height: CGFloat
+    let width: CGFloat
 
     var body: some View {
         ZStack(alignment: .topLeading) {
             RoundedRectangle(cornerRadius: Constants.cornerRadius, style: .continuous)
                 .fill(HomeViewConstants.primaryText.opacity(0.06))
-                .frame(height: height)
+                .frame(width: width, height: height)
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
@@ -325,6 +333,7 @@ private struct TodayPickHeroCard: View {
     let title: String
     let subtitle: String
     let height: CGFloat
+    let width: CGFloat
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -343,7 +352,7 @@ private struct TodayPickHeroCard: View {
                     Image(imageName).resizable().scaledToFill()
                 }
             }
-            .frame(height: height)
+            .frame(width: width, height: height)
             .clipped()
 
             // Darken bottom for readable text
@@ -355,6 +364,7 @@ private struct TodayPickHeroCard: View {
                 startPoint: .top,
                 endPoint: .bottom
             )
+            .frame(width: width, height: height)
 
             VStack(alignment: .leading, spacing: 10) {
                 HStack {

@@ -8,6 +8,10 @@
 import SwiftUI
 
 struct ProfileView: View {
+    private var isGuestUser: Bool {
+        (authVM.signedInUser?.email ?? "").isEmpty
+    }
+
 
     @EnvironmentObject var authVM: AuthViewModel
     @EnvironmentObject var premium: PremiumManager
@@ -35,7 +39,12 @@ struct ProfileView: View {
                     VStack(spacing: Layout.sectionSpacing) {
                         header
                         planCard
-                        menuCard
+
+                        if isGuestUser {
+                            guestAuthCard
+                        } else {
+                            menuCard
+                        }
                     }
                     .padding(.horizontal, Layout.horizontalPadding)
                     .padding(.top, Layout.topPadding)
@@ -202,6 +211,37 @@ struct ProfileView: View {
         }
         .buttonStyle(.plain)
         .disabled(premium.isPremium)
+    }
+
+    private var guestAuthCard: some View {
+        VStack(spacing: 0) {
+            ProfileMenuRow(
+                iconSystemName: "apple.logo",
+                iconBackground: Colors.grayIconBackground,
+                iconForeground: Colors.primaryText,
+                title: "Continue with Apple",
+                isDestructive: false
+            ) {
+                Task { await authVM.signInWithApple() }
+            }
+
+            divider
+
+            ProfileMenuRow(
+                iconSystemName: "globe",
+                iconBackground: Colors.grayIconBackground,
+                iconForeground: Colors.primaryText,
+                title: "Continue with Google",
+                isDestructive: false
+            ) {
+                Task { await authVM.signInWithGoogle() }
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: Layout.cardCornerRadius, style: .continuous)
+                .fill(Color.white)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: Layout.cardCornerRadius, style: .continuous))
     }
 
     private var menuCard: some View {
